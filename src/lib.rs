@@ -1,3 +1,7 @@
+mod grid;
+
+pub use grid::Grid;
+
 #[cfg(test)]
 mod tests {
     #[test]
