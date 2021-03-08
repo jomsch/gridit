@@ -21,7 +21,7 @@ impl<T: Clone> Grid<T> {
 
     #[inline]
     fn translate(&self, x: usize, y: usize) -> usize {
-        x * self.height + y 
+        y * self.width + x 
     }
     
     #[inline]
@@ -45,6 +45,7 @@ impl<T: Clone> Grid<T> {
         None
     }
 
+    // TODO: document valid inputs with increased x value but low y value eg : size (3,3) get_unchecked(8,0)
     pub fn get_unchecked(&self, x: usize, y: usize) -> &T {
         let idx = self.translate(x, y);
         &self.cells[idx]
@@ -58,6 +59,7 @@ impl<T: Clone> Grid<T> {
         None
     }
 
+    // TODO: document valid inputs with increased x value but low y value eg : size (3,3) set_unchecked(8,0)
     pub fn set_unchecked(&mut self, x: usize, y: usize, value: T) {
         let idx = self.translate(x, y);
         self.cells[idx] = value;
@@ -144,12 +146,61 @@ mod tests {
 
     #[test]
     fn get_cell_in_grid() {
-        let grid = Grid::new(3, 5, 1u8);
-        let cell = grid.get(2, 2);
-        assert_eq!(cell, Some(&1));
+        let grid = Grid {width:3, height:3, cells: vec![1,1,1,1,2,1,1,1,1]};
+        let cell = grid.get(1, 1);
+        assert_eq!(cell, Some(&2));
+    }
 
-        let mut grid = grid;
+
+    #[test]
+    fn get_mut_cell_in_grid() {
+        let mut grid = Grid {width:3, height:3, cells: vec![1,1,1,1,2,1,1,1,1]};
         let mut_cell = grid.get_mut(1, 1);
-        assert_eq!(mut_cell, Some(&mut 1));
+        assert_eq!(mut_cell, Some(&mut 2));
+    }
+
+    #[test]
+    fn get_unchecked_cell_in_grid() {
+        let grid = Grid {width:3, height:3, cells: vec![1,1,1,1,2,1,1,1,1]};
+        let cell = grid.get_unchecked(1, 1);
+        assert_eq!(cell, &2);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn get_unchecked_panic_cell_in_grid() {
+        let grid = Grid {width:3, height:3, cells: vec![1,1,1,1,2,1,1,1,1]};
+        let cell = grid.get_unchecked(3,2);
+    }
+
+    #[test]
+    fn set_cell_in_grid() {
+        let mut grid = Grid::new(3, 5, 1u8);
+        grid.set(2, 2, 2u8);
+        let cell = grid.get(2, 2);
+        assert_eq!(cell, Some(&2));
+    }
+
+    #[test]
+    fn set_unchecked_cell_in_grid() {
+        let mut grid = Grid::new(3, 5, 1u8);
+        grid.set_unchecked(2, 2, 2u8);
+        let cell = grid.get(2, 2);
+        assert_eq!(cell, Some(&2));
+    }
+
+    #[test]
+    #[should_panic]
+    fn set_unchecked_panic_cell_in_grid() {
+        let mut grid = Grid::new(3, 3, 1u8);
+        grid.set_unchecked(2, 3, 2u8);
+    }
+    
+    #[test]
+    fn replace_cell_in_grid() {
+        let mut grid = Grid::new(2, 2, 1u8);
+        let value = grid.replace(1, 1, 2u8);
+        assert_eq!(value, Some(1));
+        assert_eq!(grid.cells, vec![1,1,1,2]);
     }
 }
