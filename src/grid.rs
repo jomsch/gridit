@@ -75,13 +75,20 @@ impl<T: Clone> Grid<T> {
         None
     }
 
-    pub fn row(&self, y: usize) -> RowIter {
-        unimplemented!()
+    pub fn row<'a>(&'a self, y: usize) -> RowIter<'a, T> {
+        let start_idx = y*self.height;
+        let end_idx = start_idx + self.width;
+        
+        RowIter {
+            idx: 0,
+            row: &self.cells[start_idx..end_idx],
+
+        }
     }
 
-    pub fn row_mut(&self, y: usize) -> RowIter {
-        unimplemented!()
-    }
+    // pub fn row_mut(&self, y: usize) -> RowIter<'a, T> {
+    //     unimplemented!()
+    // }
 
 
     pub fn column(&self, x: usize) -> ColumnIter {
@@ -117,22 +124,28 @@ impl<T: Clone> Grid<T> {
     }
 }
 
-// impl<T: PartialEq> PartialEq for Grid<T> {
-//     fn eq(&self, other: &Self) -> bool {
-//         self == other
-//     }
-// }
-
 pub trait Pattern {
     fn pattern(&self) -> PatternIter;
-
 }
 
-pub struct RowIter;
+pub struct RowIter<'a, T> {
+    idx: usize,
+    row: &'a [T],
+}
+
+impl<'a, T> Iterator for RowIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.idx += 1;
+        self.row.get(self.idx-1) 
+    }
+}
+
+
+
 pub struct ColumnIter;
 pub struct NeighborIter;
 pub struct PatternIter;
-
 
 #[cfg(test)]
 mod tests {
@@ -202,5 +215,27 @@ mod tests {
         let value = grid.replace(1, 1, 2u8);
         assert_eq!(value, Some(1));
         assert_eq!(grid.cells, vec![1,1,1,2]);
+    }
+
+    #[test]
+    fn row_iter() {
+        let grid = Grid { width:3, height:3, cells: vec![0, 0, 0, 1, 1, 1, 2, 2, 2] };
+        let mut row_iter = grid.row(0);
+        assert_eq!(row_iter.next(), Some(&0));
+        assert_eq!(row_iter.next(), Some(&0));
+        assert_eq!(row_iter.next(), Some(&0));
+        assert_eq!(row_iter.next(), None);
+
+        let mut row_iter = grid.row(1);
+        assert_eq!(row_iter.next(), Some(&1));
+        assert_eq!(row_iter.next(), Some(&1));
+        assert_eq!(row_iter.next(), Some(&1));
+        assert_eq!(row_iter.next(), None);
+
+        let mut row_iter = grid.row(2);
+        assert_eq!(row_iter.next(), Some(&2));
+        assert_eq!(row_iter.next(), Some(&2));
+        assert_eq!(row_iter.next(), Some(&2));
+        assert_eq!(row_iter.next(), None);
     }
 }
