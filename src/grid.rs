@@ -15,7 +15,9 @@ impl<T: Clone> Grid<T> {
             cells: vec![default_value; width * height],
         }
     }
+}
 
+impl<T> Grid<T> {
     #[inline]
     fn translate(&self, x: usize, y: usize) -> usize {
         y * self.width + x
@@ -72,6 +74,18 @@ impl<T: Clone> Grid<T> {
         None
     }
 
+    pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
+        GridIter {
+            grid_iter: self.cells.iter(),
+        }
+    }
+
+    pub fn iter_mut<'a>(&'a mut self) -> GridIterMut<'a, T> {
+        GridIterMut {
+            grid_iter: self.cells.iter_mut(),
+        }
+    }
+
     pub fn row<'a>(&'a self, y: usize) -> RowIter<'a, T> {
         let start_idx = y * self.height;
         let end_idx = start_idx + self.width;
@@ -81,22 +95,26 @@ impl<T: Clone> Grid<T> {
         }
     }
 
-     pub fn row_mut<'a>(&'a mut self, y: usize) -> RowIterMut<'a, T> {
+    pub fn row_mut<'a>(&'a mut self, y: usize) -> RowIterMut<'a, T> {
         let start_idx = y * self.height;
         let end_idx = start_idx + self.width;
 
         RowIterMut {
             row_iter: self.cells[start_idx..end_idx].iter_mut(),
         }
-     }
-
-    pub fn column(&self, x: usize) -> ColumnIter {
-        unimplemented!()
     }
 
-    pub fn column_mut(&self, x: usize) -> ColumnIter {
-        unimplemented!()
+    pub fn column<'a>(&'a self, x: usize) -> ColumnIter<'a, T> {
+        ColumnIter {
+            idx: 0,
+            col: x,
+            grid: &self,
+        }
     }
+
+    // pub fn column_mut(&self, x: usize) -> ColumnIter {
+    //     unimplemented!()
+    // }
 
     pub fn neighbors(&self, x: usize, y: usize) -> NeighborIter {
         unimplemented!()
@@ -123,8 +141,26 @@ impl<T: Clone> Grid<T> {
     }
 }
 
-pub trait Pattern {
-    fn pattern(&self) -> PatternIter;
+pub struct GridIter<'a, T> {
+    grid_iter: std::slice::Iter<'a, T>,
+}
+
+impl<'a, T> Iterator for GridIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.grid_iter.next()
+    }
+}
+
+pub struct GridIterMut<'a, T> {
+    grid_iter: std::slice::IterMut<'a, T>,
+}
+
+impl<'a, T> Iterator for GridIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.grid_iter.next()
+    }
 }
 
 pub struct RowIter<'a, T> {
@@ -149,8 +185,40 @@ impl<'a, T> Iterator for RowIterMut<'a, T> {
     }
 }
 
-pub struct ColumnIter;
+pub struct ColumnIter<'a, T> {
+    idx: usize,
+    col: usize,
+    grid: &'a Grid<T>,
+}
+
+impl<'a, T> Iterator for ColumnIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.idx += 1;
+        self.grid.get(self.col, self.idx - 1)
+    }
+}
+
+// pub struct ColumnIterMut<'a, T> {
+//     idx: usize,
+//     col: usize,
+//     grid: &'a mut Grid<T>,
+// }
+
+// impl<'a, T> Iterator for ColumnIterMut<'a, T> {
+//     type Item = &'a mut T;
+//     fn next(&mut self) -> Option<Self::Item> {
+//         self.idx += 1;
+//         self.grid.get_mut(self.col, self.idx -1)
+//     }
+// }
+
 pub struct NeighborIter;
+
+pub trait Pattern {
+    fn pattern(&self) -> PatternIter;
+}
+
 pub struct PatternIter;
 
 #[cfg(test)]
@@ -246,6 +314,35 @@ mod tests {
     }
 
     #[test]
+    fn grid_iter() {
+        let grid = Grid {
+            width: 3,
+            height: 1,
+            cells: vec![0, 1, 2],
+        };
+        let mut grid_iter = grid.iter();
+        assert_eq!(grid_iter.next(), Some(&0));
+        assert_eq!(grid_iter.next(), Some(&1));
+        assert_eq!(grid_iter.next(), Some(&2));
+        assert_eq!(grid_iter.next(), None);
+    }
+
+    #[test]
+    fn grid_iter_mut() {
+        let mut grid = Grid {
+            width: 3,
+            height: 1,
+            cells: vec![0, 1, 2],
+        };
+
+        let mut grid_iter = grid.iter_mut();
+        assert_eq!(grid_iter.next(), Some(&mut 0));
+        assert_eq!(grid_iter.next(), Some(&mut 1));
+        assert_eq!(grid_iter.next(), Some(&mut 2));
+        assert_eq!(grid_iter.next(), None);
+    }
+
+    #[test]
     fn row_iter() {
         let grid = Grid {
             width: 3,
@@ -295,5 +392,24 @@ mod tests {
         assert_eq!(row_iter.next(), Some(&mut 2));
         assert_eq!(row_iter.next(), Some(&mut 2));
         assert_eq!(row_iter.next(), None);
+    }
+
+    #[test]
+    fn column_iter() {
+        let mut grid = Grid {
+            width: 2,
+            height: 2,
+            cells: vec![0, 1, 0, 1],
+        };
+
+        let mut col_iter = grid.column(0);
+        assert_eq!(col_iter.next(), Some(&0));
+        assert_eq!(col_iter.next(), Some(&0));
+        assert_eq!(col_iter.next(), None);
+
+        let mut col_iter = grid.column(1);
+        assert_eq!(col_iter.next(), Some(&1));
+        assert_eq!(col_iter.next(), Some(&1));
+        assert_eq!(col_iter.next(), None);
     }
 }
