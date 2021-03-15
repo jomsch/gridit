@@ -1,6 +1,6 @@
-use std::mem;
-use std::iter::{StepBy, Skip};
 use super::iters::*;
+use std::iter::{Skip, StepBy};
+use std::mem;
 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
@@ -116,19 +116,42 @@ impl<T> Grid<T> {
 
     pub fn column_mut<'a>(&'a mut self, x: usize) -> ColumnIterMut<'a, T> {
         let width = self.width;
-        let iter = self.iter_mut()
-            .skip(x)
-            .step_by(width);
-        ColumnIterMut {
-            column_iter: iter,
+        let iter = self.iter_mut().skip(x).step_by(width);
+        ColumnIterMut { column_iter: iter }
+    }
+
+    pub fn neighbors<'a>(&'a self, x: usize, y: usize) -> NeighborIter<'a, T> {
+        let neighbor_position: [(isize, isize); 8] = [
+            (-1, -1),
+            (0, -1),
+            (1, -1),
+            (-1, 0),
+            (1, 0),
+            (-1, 1),
+            (0, 1),
+            (1, 1),
+        ];
+        let neighbor_positions: Vec<(usize, usize)> = neighbor_position
+            .into_iter()
+            .filter_map(|(px, py)| {
+                let (x, y) = (x as isize, y as isize);
+                let x = x.checked_add(*px)? as usize;
+                let y = y.checked_add(*py)? as usize;
+
+                if self.get(x, y).is_some() {
+                    return Some((x, y));
+                }
+                None
+            })
+            .collect();
+
+        NeighborIter {
+            positions: Box::new(neighbor_positions.into_iter()),
+            grid: &self,
         }
     }
 
-    pub fn neighbors(&self, x: usize, y: usize) -> NeighborIter {
-        unimplemented!()
-    }
-
-    pub fn neighbors_mut(&self, x: usize, y: usize) -> NeighborIter {
+    pub fn neighbors_mut(&self, x: usize, y: usize) -> NeighborIterMut {
         unimplemented!()
     }
 
@@ -358,5 +381,37 @@ mod tests {
         assert_eq!(col_iter.next(), Some(&mut 1));
         assert_eq!(col_iter.next(), Some(&mut 1));
         assert_eq!(col_iter.next(), None);
+    }
+
+    #[test]
+    fn neighbor_iter() {
+        let mut grid = Grid {
+            width: 3,
+            height: 3,
+            cells: (0..9).collect(),
+        };
+
+        // middle
+        let mut neighbors = grid.neighbors(1, 1);
+        assert_eq!(neighbors.next(), Some(&0));
+        assert_eq!(neighbors.next(), Some(&1));
+        assert_eq!(neighbors.next(), Some(&2));
+        assert_eq!(neighbors.next(), Some(&3));
+        assert_eq!(neighbors.next(), Some(&5));
+        assert_eq!(neighbors.next(), Some(&6));
+        assert_eq!(neighbors.next(), Some(&7));
+        assert_eq!(neighbors.next(), Some(&8));
+
+        // top left corner
+        let mut neighbors = grid.neighbors(0, 0);
+        assert_eq!(neighbors.next(), Some(&1));
+        assert_eq!(neighbors.next(), Some(&3));
+        assert_eq!(neighbors.next(), Some(&4));
+
+        // bottom right corner
+        let mut neighbors = grid.neighbors(2, 2);
+        assert_eq!(neighbors.next(), Some(&4));
+        assert_eq!(neighbors.next(), Some(&5));
+        assert_eq!(neighbors.next(), Some(&7));
     }
 }

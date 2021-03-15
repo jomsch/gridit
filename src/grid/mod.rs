@@ -1,6 +1,4 @@
 mod grid;
 mod iters;
 
-pub use grid::Grid as Grid;
-
-
+pub use grid::Grid;
