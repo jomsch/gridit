@@ -1,4 +1,5 @@
 use std::mem;
+use std::iter::{StepBy, Skip};
 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
@@ -112,9 +113,15 @@ impl<T> Grid<T> {
         }
     }
 
-    // pub fn column_mut(&self, x: usize) -> ColumnIter {
-    //     unimplemented!()
-    // }
+    pub fn column_mut<'a>(&'a mut self, x: usize) -> ColumnIterMut<'a, T> {
+        let width = self.width;
+        let iter = self.iter_mut()
+            .skip(x)
+            .step_by(width);
+        ColumnIterMut {
+            column_iter: iter,
+        }
+    }
 
     pub fn neighbors(&self, x: usize, y: usize) -> NeighborIter {
         unimplemented!()
@@ -199,19 +206,18 @@ impl<'a, T> Iterator for ColumnIter<'a, T> {
     }
 }
 
-// pub struct ColumnIterMut<'a, T> {
-//     idx: usize,
-//     col: usize,
-//     grid: &'a mut Grid<T>,
-// }
+pub struct ColumnIterMut<'a, T> { 
+    // TODO change column_iter to be a more generic type that implements Iterator
+    column_iter: StepBy<Skip<GridIterMut<'a, T>>>,
+}
 
-// impl<'a, T> Iterator for ColumnIterMut<'a, T> {
-//     type Item = &'a mut T;
-//     fn next(&mut self) -> Option<Self::Item> {
-//         self.idx += 1;
-//         self.grid.get_mut(self.col, self.idx -1)
-//     }
-// }
+impl<'a, T>Iterator for ColumnIterMut<'a, T> {
+    type Item = &'a mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.column_iter.next()
+    }
+}
 
 pub struct NeighborIter;
 
@@ -410,6 +416,25 @@ mod tests {
         let mut col_iter = grid.column(1);
         assert_eq!(col_iter.next(), Some(&1));
         assert_eq!(col_iter.next(), Some(&1));
+        assert_eq!(col_iter.next(), None);
+    }
+
+    #[test]
+    fn column_iter_mut() {
+        let mut grid = Grid {
+            width: 2,
+            height: 2,
+            cells: vec![0, 1, 0, 1],
+        };
+
+        let mut col_iter = grid.column_mut(0);
+        assert_eq!(col_iter.next(), Some(&mut 0));
+        assert_eq!(col_iter.next(), Some(&mut 0));
+        assert_eq!(col_iter.next(), None);
+
+        let mut col_iter = grid.column_mut(1);
+        assert_eq!(col_iter.next(), Some(&mut 1));
+        assert_eq!(col_iter.next(), Some(&mut 1));
         assert_eq!(col_iter.next(), None);
     }
 }
