@@ -2,6 +2,15 @@ use super::iters::*;
 use std::iter::{Skip, StepBy};
 use std::mem;
 
+
+// Utility Enum for storing Negative(N) and Positive(P) usize 
+#[derive(Clone)]
+enum N {
+    N(usize),
+    P(usize)
+}
+
+
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
     cells: Vec<T>,
@@ -120,33 +129,43 @@ impl<T> Grid<T> {
         ColumnIterMut { column_iter: iter }
     }
 
-    pub fn neighbors<'a>(&'a self, x: usize, y: usize) -> NeighborIter<'a, T> {
-        let neighbor_position: [(isize, isize); 8] = [
-            (-1, -1),
-            (0, -1),
-            (1, -1),
-            (-1, 0),
-            (1, 0),
-            (-1, 1),
-            (0, 1),
-            (1, 1),
+
+    pub fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
+        let neighbor_position: [(N, N); 8] = [
+            (N::N(1), N::N(1)),
+            (N::P(0), N::N(1)),
+            (N::P(1), N::N(1)),
+            (N::N(1), N::P(0)),
+            (N::P(1), N::P(0)),
+            (N::N(1), N::P(1)),
+            (N::P(0), N::P(1)),
+            (N::P(1), N::P(1)),
         ];
-        let neighbor_positions: Vec<(usize, usize)> = neighbor_position
-            .into_iter()
-            .filter_map(|(px, py)| {
-                let (x, y) = (x as isize, y as isize);
-                let x = x.checked_add(*px)? as usize;
-                let y = y.checked_add(*py)? as usize;
+
+        let valid_positions: Vec<(usize, usize)> = neighbor_position.iter()
+            .filter_map(|(nx, ny)| {
+                let x = match nx {
+                    N::N(px) => x.checked_sub(*px)?,
+                    N::P(px) => x.checked_add(*px)?
+                };
+                let y = match ny {
+                    N::N(py) => y.checked_sub(*py)?,
+                    N::P(py) => y.checked_add(*py)?
+                };
 
                 if self.get(x, y).is_some() {
                     return Some((x, y));
                 }
                 None
-            })
-            .collect();
 
+            }).collect();
+
+        valid_positions
+    }
+
+    pub fn neighbors<'a>(&'a self, x: usize, y: usize) -> NeighborIter<'a, T> {
         NeighborIter {
-            positions: Box::new(neighbor_positions.into_iter()),
+            positions: Box::new(self.get_neighbor_positions(x, y).into_iter()),
             grid: &self,
         }
     }
