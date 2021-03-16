@@ -39,6 +39,14 @@ impl<T> Grid<T> {
         x < self.width && y < self.height
     }
 
+    pub fn size(&self) -> (usize, usize) {
+        (self.width, self.height)
+    }
+
+    pub fn len(&self) -> usize {
+        self.cells.len()
+    }
+
     pub fn get(&self, x: usize, y: usize) -> Option<&T> {
         if self.is_bounds(x, y) {
             let idx = self.translate(x, y);
