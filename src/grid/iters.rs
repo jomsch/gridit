@@ -1,6 +1,25 @@
 use super::Grid;
 use std::iter::{Skip, StepBy};
 
+pub struct PositionsIter {
+    pub(crate) len: usize,
+    pub(crate) width: usize,
+    pub(crate) idx: usize,
+}
+
+impl Iterator for PositionsIter {
+    type Item = (usize, usize);
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx >= self.len {
+            return None;
+        }
+        let x = self.idx % self.width;
+        let y = self.idx / self.width;
+        self.idx += 1;
+        Some((x, y))
+    }
+}
+
 pub struct GridIter<'a, T> {
     pub(crate) grid_iter: std::slice::Iter<'a, T>,
 }
@@ -88,7 +107,20 @@ impl<'a, T> Iterator for NeighborIter<'a, T> {
     }
 }
 
-pub struct NeighborIterMut;
+// pub struct NeighborIterMut<'a,T> {
+//     pub(crate) positions: Box<Iterator<Item = (usize, usize)>>,
+//     pub(crate) grid: &'a mut Grid<T>,
+// }
+
+// impl<'a, T> Iterator for NeighborIterMut<'a, T> {
+//     type Item = &'a mut T;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         let pos = self.positions.next()?;
+//         let mut cell = self.grid.get_mut_unchecked(pos.0, pos.1);
+//         Some(cell)
+//     }
+// }
 
 pub trait Pattern {
     fn pattern(&self) -> PatternIter;

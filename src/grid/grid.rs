@@ -46,6 +46,7 @@ impl<T> Grid<T> {
         }
         None
     }
+    
 
     pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut T> {
         if self.is_bounds(x, y) {
@@ -59,6 +60,12 @@ impl<T> Grid<T> {
     pub fn get_unchecked(&self, x: usize, y: usize) -> &T {
         let idx = self.translate(x, y);
         &self.cells[idx]
+    }
+
+    // TODO: document valid inputs with increased x value but low y value eg : size (3,3) get_unchecked(8,0)
+    pub fn get_mut_unchecked(&mut self, x: usize, y: usize) -> &mut T {
+        let idx = self.translate(x, y);
+        &mut self.cells[idx]
     }
 
     pub fn set(&mut self, x: usize, y: usize, value: T) -> Option<()> {
@@ -83,6 +90,14 @@ impl<T> Grid<T> {
             return Some(old);
         }
         None
+    }
+
+    pub fn positions(&self) -> PositionsIter {
+        PositionsIter {
+            len: self.cells.len(),
+            width: self.width,
+            idx: 0,
+        }
     }
 
     pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
@@ -170,9 +185,12 @@ impl<T> Grid<T> {
         }
     }
 
-    pub fn neighbors_mut(&self, x: usize, y: usize) -> NeighborIterMut {
-        unimplemented!()
-    }
+    // pub fn neighbors_mut<'a>(&'a mut self, x: usize, y: usize) -> NeighborIterMut<'a, T> {
+    //     NeighborIterMut {
+    //         positions: Box::new(self.get_neighbor_positions(x, y).into_iter()),
+    //         grid: &mut self
+    //     }
+    // }
 
     pub fn pattern<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
         unimplemented!()
@@ -281,6 +299,25 @@ mod tests {
         let value = grid.replace(1, 1, 2u8);
         assert_eq!(value, Some(1));
         assert_eq!(grid.cells, vec![1, 1, 1, 2]);
+    }
+
+    #[test]
+    fn grid_positions_iter() {
+        let mut grid = Grid {
+            width: 3,
+            height: 2,
+            cells: vec![0; 3*2],
+        };
+
+
+        let mut positions = grid.positions();
+        assert_eq!(positions.next(), Some((0, 0)));
+        assert_eq!(positions.next(), Some((1, 0)));
+        assert_eq!(positions.next(), Some((2, 0)));
+        assert_eq!(positions.next(), Some((0, 1)));
+        assert_eq!(positions.next(), Some((1, 1)));
+        assert_eq!(positions.next(), Some((2, 1)));
+        assert_eq!(positions.next(), None);
     }
 
     #[test]
@@ -432,5 +469,13 @@ mod tests {
         assert_eq!(neighbors.next(), Some(&4));
         assert_eq!(neighbors.next(), Some(&5));
         assert_eq!(neighbors.next(), Some(&7));
+
+        // bottom mid
+        let mut neighbors = grid.neighbors(1, 2);
+        assert_eq!(neighbors.next(), Some(&3));
+        assert_eq!(neighbors.next(), Some(&4));
+        assert_eq!(neighbors.next(), Some(&5));
+        assert_eq!(neighbors.next(), Some(&6));
+        assert_eq!(neighbors.next(), Some(&8));
     }
 }
