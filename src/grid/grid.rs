@@ -3,10 +3,12 @@ use std::iter::{Skip, StepBy};
 use std::mem;
 
 
-// Utility Enum for storing Negative(N) and Positive(P) usize 
+// Utility Enum for storing Negative(N) and Positive(P) as usize
 #[derive(Clone)]
 enum N {
+    //Negative Number
     N(usize),
+    //Positive Number
     P(usize)
 }
 
@@ -47,6 +49,8 @@ impl<T> Grid<T> {
         self.cells.len()
     }
 
+    /// Returns a reference to an element at position x,y
+    /// or None, if x or y are out of bounds.
     pub fn get(&self, x: usize, y: usize) -> Option<&T> {
         if self.is_bounds(x, y) {
             let idx = self.translate(x, y);
@@ -54,8 +58,9 @@ impl<T> Grid<T> {
         }
         None
     }
-    
 
+    /// Returns a mutable reference to an element at position x,y
+    /// or None, if x or y are out of bounds.
     pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut T> {
         if self.is_bounds(x, y) {
             let idx = self.translate(x, y);
@@ -64,18 +69,35 @@ impl<T> Grid<T> {
         None
     }
 
-    // TODO: document valid inputs with increased x value but low y value eg : size (3,3) get_unchecked(8,0)
+    /// Returns a reference to an element at position x, y.  
+    /// Does not do any bound checks.  
+    ///     x or y do not have to be in bounds as long x*y < grid.len()  
+    ///     e.g on a grid size 3,3: `get_unchecked(8,0)` will return the last element
+    /// 
+    /// # Panics
+    ///
+    /// Panics if x*y > grid.len().
     pub fn get_unchecked(&self, x: usize, y: usize) -> &T {
         let idx = self.translate(x, y);
         &self.cells[idx]
     }
 
-    // TODO: document valid inputs with increased x value but low y value eg : size (3,3) get_unchecked(8,0)
+    /// Returns a reference to an element at position x, y.  
+    /// Does not do any bound checks.  
+    ///     x or y do not have to be in bounds as long x*y < grid.len()  
+    ///     e.g on a grid size 3,3: `get_unchecked(8,0)` will return the last element  
+    /// 
+    /// # Panics
+    ///
+    /// Panics if x*y > grid.len().
     pub fn get_mut_unchecked(&mut self, x: usize, y: usize) -> &mut T {
         let idx = self.translate(x, y);
         &mut self.cells[idx]
     }
 
+    /// Sets the element at position x, y to `value`.  
+    /// Returns None if x or y is out of bounds,
+    /// or () otherwise
     pub fn set(&mut self, x: usize, y: usize, value: T) -> Option<()> {
         if self.is_bounds(x, y) {
             let idx = self.translate(x, y);
@@ -84,13 +106,22 @@ impl<T> Grid<T> {
         None
     }
 
-    // TODO: document valid inputs with increased x value but low y value eg : size (3,3) set_unchecked(8,0)
+    /// Sets the element at position x, y to `value`.  
+    /// Does not do any bound checks.  
+    ///     x or y do not have to be in bounds as long x*y < grid.len()  
+    ///     e.g on a grid size 3,3: `set_unchecked(8,0)` will set the last element to `value`  
+    /// 
+    /// # Panics
+    ///
+    /// Panics if x*y > grid.len().
     pub fn set_unchecked(&mut self, x: usize, y: usize, value: T) {
         let idx = self.translate(x, y);
         self.cells[idx] = value;
     }
 
-    // Sets (x, y) to v and returns the old Value of (x, y)
+    /// Sets the element at position x,y to `value`  
+    /// returns the old value of x,y
+    /// or None if x or y is out of bounds
     pub fn replace(&mut self, x: usize, y: usize, value: T) -> Option<T> {
         if self.is_bounds(x, y) {
             let idx = self.translate(x, y);
@@ -100,6 +131,8 @@ impl<T> Grid<T> {
         None
     }
 
+    /// Creates an iterator over all 2D positions in the Grid.  
+    /// Iterator yields the positions as tuple of usize e.g (usize, usize).
     pub fn positions(&self) -> PositionsIter {
         PositionsIter {
             len: self.cells.len(),
@@ -108,19 +141,27 @@ impl<T> Grid<T> {
         }
     }
 
+    /// Creates an iterator over every elements in the grid.
     pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
         GridIter {
             grid_iter: self.cells.iter(),
         }
     }
 
+    /// Creates an mutable iterator over every element in the grid.
     pub fn iter_mut<'a>(&'a mut self) -> GridIterMut<'a, T> {
         GridIterMut {
             grid_iter: self.cells.iter_mut(),
         }
     }
 
+    /// Creates an iterator over a specific row in the grid.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the row is out of bounds.
     pub fn row<'a>(&'a self, y: usize) -> RowIter<'a, T> {
+        assert!(self.is_bounds(0, y));
         let start_idx = y * self.height;
         let end_idx = start_idx + self.width;
 
@@ -129,7 +170,14 @@ impl<T> Grid<T> {
         }
     }
 
+
+    /// Creates an mutable iterator over a specific row in the grid.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the row is out of bounds.
     pub fn row_mut<'a>(&'a mut self, y: usize) -> RowIterMut<'a, T> {
+        assert!(self.is_bounds(0, y));
         let start_idx = y * self.height;
         let end_idx = start_idx + self.width;
 
@@ -138,7 +186,13 @@ impl<T> Grid<T> {
         }
     }
 
+    /// Creates an iterator over a specific column in the grid.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the column is out of bounds.
     pub fn column<'a>(&'a self, x: usize) -> ColumnIter<'a, T> {
+        assert!(self.is_bounds(x, 0));
         ColumnIter {
             idx: 0,
             col: x,
@@ -146,14 +200,21 @@ impl<T> Grid<T> {
         }
     }
 
+    /// Creates an mutable iterator over a specific column in the grid.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the column is out of bounds.
     pub fn column_mut<'a>(&'a mut self, x: usize) -> ColumnIterMut<'a, T> {
+        assert!(self.is_bounds(x, 0));
         let width = self.width;
         let iter = self.iter_mut().skip(x).step_by(width);
         ColumnIterMut { column_iter: iter }
     }
 
 
-    pub fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
+    // Returns every valid neighbor position of x,y
+    fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
         let neighbor_position: [(N, N); 8] = [
             (N::N(1), N::N(1)),
             (N::P(0), N::N(1)),
@@ -186,7 +247,13 @@ impl<T> Grid<T> {
         valid_positions
     }
 
+    /// Returns an iterator over every neighbor from position x,y.
+    ///
+    /// # Panics
+    ///
+    /// Panics if x or y is out of bounds.
     pub fn neighbors<'a>(&'a self, x: usize, y: usize) -> NeighborIter<'a, T> {
+        assert!(self.is_bounds(x, y));
         NeighborIter {
             positions: Box::new(self.get_neighbor_positions(x, y).into_iter()),
             grid: &self,
