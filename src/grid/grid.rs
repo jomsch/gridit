@@ -289,12 +289,6 @@ impl<T> Grid<T> {
     }
 }
 
-impl Position {
-    pub fn new(x: usize, y: usize) -> Self {
-        Position {x, y}
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
