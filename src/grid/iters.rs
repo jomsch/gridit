@@ -1,4 +1,4 @@
-use super::Grid;
+use super::grid::{Grid, Position};
 use std::iter::{Skip, StepBy};
 
 pub struct PositionsIter {
@@ -8,7 +8,7 @@ pub struct PositionsIter {
 }
 
 impl Iterator for PositionsIter {
-    type Item = (usize, usize);
+    type Item = Position; 
     fn next(&mut self) -> Option<Self::Item> {
         if self.idx >= self.len {
             return None;
@@ -93,7 +93,7 @@ impl<'a, T> Iterator for ColumnIterMut<'a, T> {
 }
 
 pub struct NeighborIter<'a, T> {
-    pub(crate) positions: Box<Iterator<Item = (usize, usize)>>,
+    pub(crate) positions: Box<Iterator<Item = Position>>,
     pub(crate) grid: &'a Grid<T>,
 }
 
