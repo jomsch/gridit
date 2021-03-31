@@ -1,8 +1,6 @@
 mod grid;
 mod iter;
-mod iters;
 mod builder;
-mod position;
 
 pub use grid::Grid;
 pub use builder::GridBuilder;
