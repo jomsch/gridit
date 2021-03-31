@@ -1,5 +1,4 @@
-use super::iters::*;
-use std::iter::{Skip, StepBy};
+use super::iter::*;
 use std::mem;
 
 
@@ -274,21 +273,21 @@ impl<T> Grid<T> {
     //     }
     // }
 
-    pub fn pattern<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
-        unimplemented!()
-    }
+    // pub fn pattern<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
+    //     unimplemented!()
+    // }
 
-    pub fn pattern_mut<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
-        unimplemented!()
-    }
+    // pub fn pattern_mut<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
+    //     unimplemented!()
+    // }
 
-    pub fn patterns<P: Pattern>(&self, x: usize, y: usize, ps: Vec<P>) -> PatternIter {
-        unimplemented!()
-    }
+    // pub fn patterns<P: Pattern>(&self, x: usize, y: usize, ps: Vec<P>) -> PatternIter {
+    //     unimplemented!()
+    // }
 
-    pub fn patterns_mut<P: Pattern>(&self, x: usize, y: usize, ps: Vec<P>) -> PatternIter {
-        unimplemented!()
-    }
+    // pub fn patterns_mut<P: Pattern>(&self, x: usize, y: usize, ps: Vec<P>) -> PatternIter {
+    //     unimplemented!()
+    // }
 }
 
 #[cfg(test)]
@@ -381,183 +380,5 @@ mod tests {
         let value = grid.replace(1, 1, 2u8);
         assert_eq!(value, Some(1));
         assert_eq!(grid.cells, vec![1, 1, 1, 2]);
-    }
-
-    #[test]
-    fn grid_positions_iter() {
-        let mut grid = Grid {
-            width: 3,
-            height: 2,
-            cells: vec![0; 3*2],
-        };
-
-
-        let mut positions = grid.positions();
-        assert_eq!(positions.next(), Some((0, 0)));
-        assert_eq!(positions.next(), Some((1, 0)));
-        assert_eq!(positions.next(), Some((2, 0)));
-        assert_eq!(positions.next(), Some((0, 1)));
-        assert_eq!(positions.next(), Some((1, 1)));
-        assert_eq!(positions.next(), Some((2, 1)));
-        assert_eq!(positions.next(), None);
-    }
-
-    #[test]
-    fn grid_iter() {
-        let grid = Grid {
-            width: 3,
-            height: 1,
-            cells: vec![0, 1, 2],
-        };
-        let mut grid_iter = grid.iter();
-        assert_eq!(grid_iter.next(), Some(&0));
-        assert_eq!(grid_iter.next(), Some(&1));
-        assert_eq!(grid_iter.next(), Some(&2));
-        assert_eq!(grid_iter.next(), None);
-    }
-
-    #[test]
-    fn grid_iter_mut() {
-        let mut grid = Grid {
-            width: 3,
-            height: 1,
-            cells: vec![0, 1, 2],
-        };
-
-        let mut grid_iter = grid.iter_mut();
-        assert_eq!(grid_iter.next(), Some(&mut 0));
-        assert_eq!(grid_iter.next(), Some(&mut 1));
-        assert_eq!(grid_iter.next(), Some(&mut 2));
-        assert_eq!(grid_iter.next(), None);
-    }
-
-    #[test]
-    fn row_iter() {
-        let grid = Grid {
-            width: 3,
-            height: 3,
-            cells: vec![0, 0, 0, 1, 1, 1, 2, 2, 2],
-        };
-        let mut row_iter = grid.row(0);
-        assert_eq!(row_iter.next(), Some(&0));
-        assert_eq!(row_iter.next(), Some(&0));
-        assert_eq!(row_iter.next(), Some(&0));
-        assert_eq!(row_iter.next(), None);
-
-        let mut row_iter = grid.row(1);
-        assert_eq!(row_iter.next(), Some(&1));
-        assert_eq!(row_iter.next(), Some(&1));
-        assert_eq!(row_iter.next(), Some(&1));
-        assert_eq!(row_iter.next(), None);
-
-        let mut row_iter = grid.row(2);
-        assert_eq!(row_iter.next(), Some(&2));
-        assert_eq!(row_iter.next(), Some(&2));
-        assert_eq!(row_iter.next(), Some(&2));
-        assert_eq!(row_iter.next(), None);
-    }
-
-    #[test]
-    fn row_iter_mut() {
-        let mut grid = Grid {
-            width: 3,
-            height: 3,
-            cells: vec![0, 0, 0, 1, 1, 1, 2, 2, 2],
-        };
-        let mut row_iter = grid.row_mut(0);
-        assert_eq!(row_iter.next(), Some(&mut 0));
-        assert_eq!(row_iter.next(), Some(&mut 0));
-        assert_eq!(row_iter.next(), Some(&mut 0));
-        assert_eq!(row_iter.next(), None);
-
-        let mut row_iter = grid.row_mut(1);
-        assert_eq!(row_iter.next(), Some(&mut 1));
-        assert_eq!(row_iter.next(), Some(&mut 1));
-        assert_eq!(row_iter.next(), Some(&mut 1));
-        assert_eq!(row_iter.next(), None);
-
-        let mut row_iter = grid.row_mut(2);
-        assert_eq!(row_iter.next(), Some(&mut 2));
-        assert_eq!(row_iter.next(), Some(&mut 2));
-        assert_eq!(row_iter.next(), Some(&mut 2));
-        assert_eq!(row_iter.next(), None);
-    }
-
-    #[test]
-    fn column_iter() {
-        let mut grid = Grid {
-            width: 2,
-            height: 2,
-            cells: vec![0, 1, 0, 1],
-        };
-
-        let mut col_iter = grid.column(0);
-        assert_eq!(col_iter.next(), Some(&0));
-        assert_eq!(col_iter.next(), Some(&0));
-        assert_eq!(col_iter.next(), None);
-
-        let mut col_iter = grid.column(1);
-        assert_eq!(col_iter.next(), Some(&1));
-        assert_eq!(col_iter.next(), Some(&1));
-        assert_eq!(col_iter.next(), None);
-    }
-
-    #[test]
-    fn column_iter_mut() {
-        let mut grid = Grid {
-            width: 2,
-            height: 2,
-            cells: vec![0, 1, 0, 1],
-        };
-
-        let mut col_iter = grid.column_mut(0);
-        assert_eq!(col_iter.next(), Some(&mut 0));
-        assert_eq!(col_iter.next(), Some(&mut 0));
-        assert_eq!(col_iter.next(), None);
-
-        let mut col_iter = grid.column_mut(1);
-        assert_eq!(col_iter.next(), Some(&mut 1));
-        assert_eq!(col_iter.next(), Some(&mut 1));
-        assert_eq!(col_iter.next(), None);
-    }
-
-    #[test]
-    fn neighbor_iter() {
-        let mut grid = Grid {
-            width: 3,
-            height: 3,
-            cells: (0..9).collect(),
-        };
-
-        // middle
-        let mut neighbors = grid.neighbors(1, 1);
-        assert_eq!(neighbors.next(), Some(&0));
-        assert_eq!(neighbors.next(), Some(&1));
-        assert_eq!(neighbors.next(), Some(&2));
-        assert_eq!(neighbors.next(), Some(&3));
-        assert_eq!(neighbors.next(), Some(&5));
-        assert_eq!(neighbors.next(), Some(&6));
-        assert_eq!(neighbors.next(), Some(&7));
-        assert_eq!(neighbors.next(), Some(&8));
-
-        // top left corner
-        let mut neighbors = grid.neighbors(0, 0);
-        assert_eq!(neighbors.next(), Some(&1));
-        assert_eq!(neighbors.next(), Some(&3));
-        assert_eq!(neighbors.next(), Some(&4));
-
-        // bottom right corner
-        let mut neighbors = grid.neighbors(2, 2);
-        assert_eq!(neighbors.next(), Some(&4));
-        assert_eq!(neighbors.next(), Some(&5));
-        assert_eq!(neighbors.next(), Some(&7));
-
-        // bottom mid
-        let mut neighbors = grid.neighbors(1, 2);
-        assert_eq!(neighbors.next(), Some(&3));
-        assert_eq!(neighbors.next(), Some(&4));
-        assert_eq!(neighbors.next(), Some(&5));
-        assert_eq!(neighbors.next(), Some(&6));
-        assert_eq!(neighbors.next(), Some(&8));
     }
 }

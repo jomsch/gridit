@@ -1,4 +1,4 @@
-use super::grid::Position;
+use crate::grid::Position;
 
 pub struct Positions<I> {
     pub(crate) inner: I,
