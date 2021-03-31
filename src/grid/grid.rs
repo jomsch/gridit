@@ -150,6 +150,8 @@ impl<T> Grid<T> {
     pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
         GridIter {
             grid_iter: self.cells.iter(),
+            width: self.width,
+            height: self.height,
         }
     }
 
