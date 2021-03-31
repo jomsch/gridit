@@ -15,9 +15,9 @@ enum N {
 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
-    cells: Vec<T>,
-    width: usize,
-    height: usize,
+  pub(crate) cells: Vec<T>,
+  pub(crate) width: usize,
+  pub(crate) height: usize,
 }
 
 impl<T: Clone> Grid<T> {
