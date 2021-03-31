@@ -12,6 +12,7 @@ enum N {
     P(usize)
 }
 
+pub type Position = (usize, usize);
 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
@@ -20,6 +21,9 @@ pub struct Grid<T> {
   pub(crate) height: usize,
 }
 
+
+/// Grid
+/// 0,0 is at the top left corner and iterators row wise.
 impl<T: Clone> Grid<T> {
     pub fn new(width: usize, height: usize, default_value: T) -> Self {
         Self {
@@ -41,6 +45,7 @@ impl<T> Grid<T> {
         x < self.width && y < self.height
     }
 
+    /// Returns with and height of the grid
     pub fn size(&self) -> (usize, usize) {
         (self.width, self.height)
     }
@@ -145,6 +150,8 @@ impl<T> Grid<T> {
     pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
         GridIter {
             grid_iter: self.cells.iter(),
+            width: self.width,
+            height: self.height,
         }
     }
 
@@ -214,7 +221,7 @@ impl<T> Grid<T> {
 
 
     // Returns every valid neighbor position of x,y
-    fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
+    fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<Position> {
         let neighbor_position: [(N, N); 8] = [
             (N::N(1), N::N(1)),
             (N::P(0), N::N(1)),
@@ -226,7 +233,7 @@ impl<T> Grid<T> {
             (N::P(1), N::P(1)),
         ];
 
-        let valid_positions: Vec<(usize, usize)> = neighbor_position.iter()
+        let valid_positions: Vec<Position> = neighbor_position.iter()
             .filter_map(|(nx, ny)| {
                 let x = match nx {
                     N::N(px) => x.checked_sub(*px)?,

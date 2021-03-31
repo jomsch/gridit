@@ -1,5 +1,6 @@
-use super::Grid;
 use std::iter::{Skip, StepBy};
+use super::grid::{Grid, Position};
+use super::position::{Positions, PositionsEnumerator};
 
 pub struct PositionsIter {
     pub(crate) len: usize,
@@ -8,7 +9,7 @@ pub struct PositionsIter {
 }
 
 impl Iterator for PositionsIter {
-    type Item = (usize, usize);
+    type Item = Position; 
     fn next(&mut self) -> Option<Self::Item> {
         if self.idx >= self.len {
             return None;
@@ -22,12 +23,53 @@ impl Iterator for PositionsIter {
 
 pub struct GridIter<'a, T> {
     pub(crate) grid_iter: std::slice::Iter<'a, T>,
+    pub(crate) width: usize,
+    pub(crate) height: usize,
 }
 
 impl<'a, T> Iterator for GridIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         self.grid_iter.next()
+    }
+}
+
+fn next_position<'a, T>(inner: &GridIter<'a, T>, prev_pos: Option<Position>) -> Position {
+    let (px, py) = match prev_pos  {
+        Some(T) => T,
+        None => return (0, 0)
+    };
+    let (x, y) = match px == (inner.width-1) {
+        true => (0, py+1),
+        false => (px+1, py)
+    };
+    (x, y)
+}
+
+impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
+    fn positions(self) -> Positions<GridIter<'a, T>> {
+        Positions {
+            inner: self,
+            next_pos: Box::new(next_position),
+            prev_position: None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod  tests {
+    use super::*;
+
+    #[test]
+    fn grid_iter_positions() {
+        let grid = Grid::new(2, 2, 9usize);
+        let mut iter = grid.iter().positions();
+
+        assert_eq!(iter.next(), Some(((0, 0), &9)));
+        assert_eq!(iter.next(), Some(((1, 0), &9)));
+        assert_eq!(iter.next(), Some(((0, 1), &9)));
+        assert_eq!(iter.next(), Some(((1, 1), &9)));
+        assert_eq!(iter.next(), None);
     }
 }
 
@@ -93,7 +135,7 @@ impl<'a, T> Iterator for ColumnIterMut<'a, T> {
 }
 
 pub struct NeighborIter<'a, T> {
-    pub(crate) positions: Box<Iterator<Item = (usize, usize)>>,
+    pub(crate) positions: Box<Iterator<Item = Position>>,
     pub(crate) grid: &'a Grid<T>,
 }
 
