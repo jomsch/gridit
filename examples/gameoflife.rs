@@ -6,7 +6,7 @@ use crossterm::terminal::{
 use crossterm::{cursor, execute, Command};
 use gridit::Grid;
 use std::fmt;
-use std::io::{stdout, Write};
+use std::io::stdout;
 use std::time::Duration;
 
 #[derive(Clone, PartialEq)]
@@ -25,7 +25,7 @@ impl PodCell {
     fn new(c: Cell) -> Self {
         PodCell {
             current: c.clone(),
-            future: c
+            future: c,
         }
     }
 
@@ -52,14 +52,12 @@ fn main() -> crossterm::Result<()> {
     let (rows, cols) = size()?;
     let (row_size, col_size) = (rows as usize, cols as usize);
     //let (row_size, col_size) = (10, 10);
-    let (mid_x, mid_y) = ((row_size-1) / 2, (col_size-1) / 2);
+    let (mid_x, mid_y) = ((row_size - 1) / 2, (col_size - 1) / 2);
 
-    let mut grid: Grid<PodCell>= Grid::new(row_size, col_size, PodCell::new(Cell::Dead));
-    grid.set_unchecked(mid_x, mid_y-1, PodCell::new(Cell::Alive));
+    let mut grid: Grid<PodCell> = Grid::new(row_size, col_size, PodCell::new(Cell::Dead));
+    grid.set_unchecked(mid_x, mid_y - 1, PodCell::new(Cell::Alive));
     grid.set_unchecked(mid_x, mid_y, PodCell::new(Cell::Alive));
-    grid.set_unchecked(mid_x, mid_y+1, PodCell::new(Cell::Alive));
-
-    let mut grid_string: String = String::with_capacity(grid.len());
+    grid.set_unchecked(mid_x, mid_y + 1, PodCell::new(Cell::Alive));
 
     loop {
         if poll(Duration::from_millis(500))? {
@@ -73,10 +71,11 @@ fn main() -> crossterm::Result<()> {
             }
         }
 
-
-
         for (x, y) in grid.positions() {
-            let neighbor_count = grid.neighbors(x, y).filter(|c| c.current == Cell::Alive).count();
+            let neighbor_count = grid
+                .neighbors(x, y)
+                .filter(|c| c.current == Cell::Alive)
+                .count();
             let current = grid.get_unchecked(x, y).current.clone();
             let mut cell = grid.get_mut_unchecked(x, y);
 
@@ -90,12 +89,13 @@ fn main() -> crossterm::Result<()> {
         }
         grid.iter_mut().for_each(|pod| pod.update());
 
-        grid_string = grid.iter().map(|c| c.current.to_char()).collect();
+        let grid_string: String = grid.iter().map(|c| c.current.to_char()).collect();
         execute!(stdout(), GridPrinter(&grid_string))?;
     }
 
     execute!(stdout(), LeaveAlternateScreen)?;
-    execute!(stdout(), cursor::Show);
+    execute!(stdout(), cursor::Show)?;
+    disable_raw_mode()?;
     Ok(())
 }
 

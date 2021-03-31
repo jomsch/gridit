@@ -1,14 +1,14 @@
-use crate::grid::{Grid, Position};
 use super::{Positions, PositionsEnumerator};
+use crate::grid::Position;
 
 fn next_position<'a, T>(inner: &GridIter<'a, T>, prev_pos: Option<Position>) -> Position {
-    let (px, py) = match prev_pos  {
-        Some(T) => T,
-        None => return (0, 0)
+    let (px, py) = match prev_pos {
+        Some(xy) => xy,
+        None => return (0, 0),
     };
-    let (x, y) = match px == (inner.width-1) {
-        true => (0, py+1),
-        false => (px+1, py)
+    let (x, y) = match px == (inner.width - 1) {
+        true => (0, py + 1),
+        false => (px + 1, py),
     };
     (x, y)
 }
@@ -16,7 +16,6 @@ fn next_position<'a, T>(inner: &GridIter<'a, T>, prev_pos: Option<Position>) -> 
 pub struct GridIter<'a, T> {
     pub(crate) grid_iter: std::slice::Iter<'a, T>,
     pub(crate) width: usize,
-    pub(crate) height: usize,
 }
 
 impl<'a, T> Iterator for GridIter<'a, T> {
@@ -25,7 +24,6 @@ impl<'a, T> Iterator for GridIter<'a, T> {
         self.grid_iter.next()
     }
 }
-
 
 impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
     fn positions(self) -> Positions<GridIter<'a, T>> {
@@ -36,7 +34,6 @@ impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
         }
     }
 }
-
 
 pub struct GridIterMut<'a, T> {
     pub(crate) grid_iter: std::slice::IterMut<'a, T>,
@@ -50,8 +47,9 @@ impl<'a, T> Iterator for GridIterMut<'a, T> {
 }
 
 #[cfg(test)]
-mod  tests {
+mod tests {
     use super::*;
+    use crate::Grid;
 
     #[test]
     fn grid_iter() {

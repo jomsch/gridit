@@ -1,7 +1,7 @@
 use crate::grid::{Grid, Position};
 
 pub struct NeighborIter<'a, T> {
-    pub(crate) positions: Box<Iterator<Item = Position>>,
+    pub(crate) positions: Box<dyn Iterator<Item = Position>>,
     pub(crate) grid: &'a Grid<T>,
 }
 
@@ -36,7 +36,7 @@ mod tests {
 
     #[test]
     fn neighbor_iter() {
-        let mut grid = Grid {
+        let grid = Grid {
             width: 3,
             height: 3,
             cells: (0..9).collect(),

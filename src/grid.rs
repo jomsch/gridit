@@ -1,25 +1,23 @@
 use super::iter::*;
 use std::mem;
 
-
 // Utility Enum for storing Negative(N) and Positive(P) as usize
 #[derive(Clone)]
 enum N {
     //Negative Number
     N(usize),
     //Positive Number
-    P(usize)
+    P(usize),
 }
 
 pub type Position = (usize, usize);
 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
-  pub(crate) cells: Vec<T>,
-  pub(crate) width: usize,
-  pub(crate) height: usize,
+    pub(crate) cells: Vec<T>,
+    pub(crate) width: usize,
+    pub(crate) height: usize,
 }
-
 
 /// Grid
 /// 0,0 is at the top left corner and iterators row wise.
@@ -77,7 +75,7 @@ impl<T> Grid<T> {
     /// Does not do any bound checks.  
     ///     x or y do not have to be in bounds as long x*y < grid.len()  
     ///     e.g on a grid size 3,3: `get_unchecked(8,0)` will return the last element
-    /// 
+    ///
     /// # Panics
     ///
     /// Panics if x*y > grid.len().
@@ -90,7 +88,7 @@ impl<T> Grid<T> {
     /// Does not do any bound checks.  
     ///     x or y do not have to be in bounds as long x*y < grid.len()  
     ///     e.g on a grid size 3,3: `get_unchecked(8,0)` will return the last element  
-    /// 
+    ///
     /// # Panics
     ///
     /// Panics if x*y > grid.len().
@@ -114,7 +112,7 @@ impl<T> Grid<T> {
     /// Does not do any bound checks.  
     ///     x or y do not have to be in bounds as long x*y < grid.len()  
     ///     e.g on a grid size 3,3: `set_unchecked(8,0)` will set the last element to `value`  
-    /// 
+    ///
     /// # Panics
     ///
     /// Panics if x*y > grid.len().
@@ -150,7 +148,6 @@ impl<T> Grid<T> {
         GridIter {
             grid_iter: self.cells.iter(),
             width: self.width,
-            height: self.height,
         }
     }
 
@@ -175,7 +172,6 @@ impl<T> Grid<T> {
             row_iter: self.cells[start_idx..end_idx].iter(),
         }
     }
-
 
     /// Creates an mutable iterator over a specific row in the grid.
     ///
@@ -218,7 +214,6 @@ impl<T> Grid<T> {
         ColumnIterMut { column_iter: iter }
     }
 
-
     // Returns every valid neighbor position of x,y
     fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<Position> {
         let neighbor_position: [(N, N); 8] = [
@@ -232,23 +227,24 @@ impl<T> Grid<T> {
             (N::P(1), N::P(1)),
         ];
 
-        let valid_positions: Vec<Position> = neighbor_position.iter()
+        let valid_positions: Vec<Position> = neighbor_position
+            .iter()
             .filter_map(|(nx, ny)| {
                 let x = match nx {
                     N::N(px) => x.checked_sub(*px)?,
-                    N::P(px) => x.checked_add(*px)?
+                    N::P(px) => x.checked_add(*px)?,
                 };
                 let y = match ny {
                     N::N(py) => y.checked_sub(*py)?,
-                    N::P(py) => y.checked_add(*py)?
+                    N::P(py) => y.checked_add(*py)?,
                 };
 
                 if self.get(x, y).is_some() {
                     return Some((x, y));
                 }
                 None
-
-            }).collect();
+            })
+            .collect();
 
         valid_positions
     }
@@ -348,7 +344,7 @@ mod tests {
             height: 3,
             cells: vec![1, 1, 1, 1, 2, 1, 1, 1, 1],
         };
-        let cell = grid.get_unchecked(3, 2);
+        let _cell = grid.get_unchecked(3, 2);
     }
 
     #[test]

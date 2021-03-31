@@ -1,6 +1,6 @@
-use crate::Grid;
 use crate::iter::GridIterMut;
-use std::iter::{StepBy, Skip};
+use crate::Grid;
+use std::iter::{Skip, StepBy};
 
 pub struct ColumnIter<'a, T> {
     pub(crate) idx: usize,
@@ -36,7 +36,7 @@ mod tests {
 
     #[test]
     fn column_iter() {
-        let mut grid = Grid {
+        let grid = Grid {
             width: 2,
             height: 2,
             cells: vec![0, 1, 0, 1],

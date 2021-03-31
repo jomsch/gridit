@@ -6,7 +6,7 @@ pub struct Positions<I> {
     pub(crate) prev_position: Option<Position>,
 }
 
-pub(crate) trait PositionsEnumerator 
+pub(crate) trait PositionsEnumerator
 where
     Self: Sized,
 {
@@ -19,5 +19,5 @@ impl<I: Iterator> Iterator for Positions<I> {
         let next_pos = (self.next_pos)(&self.inner, self.prev_position);
         self.prev_position = Some(next_pos);
         Some((next_pos, self.inner.next()?))
-   }
+    }
 }

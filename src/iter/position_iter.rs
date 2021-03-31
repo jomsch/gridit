@@ -7,7 +7,7 @@ pub struct PositionsIter {
 }
 
 impl Iterator for PositionsIter {
-    type Item = Position; 
+    type Item = Position;
     fn next(&mut self) -> Option<Self::Item> {
         if self.idx >= self.len {
             return None;
@@ -25,10 +25,10 @@ mod tests {
 
     #[test]
     fn grid_positions_iter() {
-        let mut grid = Grid {
+        let grid = Grid {
             width: 3,
             height: 2,
-            cells: vec![0; 3*2],
+            cells: vec![0; 3 * 2],
         };
 
         let mut positions = grid.positions();

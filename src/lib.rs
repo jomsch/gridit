@@ -1,9 +1,9 @@
+mod builder;
 mod grid;
 mod iter;
-mod builder;
 
-pub use grid::Grid;
 pub use builder::GridBuilder;
+pub use grid::Grid;
 
 #[cfg(test)]
 mod tests {
