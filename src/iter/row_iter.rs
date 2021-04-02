@@ -1,5 +1,9 @@
+use super::{PositionsEnumerator, Positions};
+use crate::grid::Position;
+
 pub struct RowIter<'a, T> {
     pub(crate) row_iter: std::slice::Iter<'a, T>,
+    pub(crate) idx: usize,
 }
 
 impl<'a, T> Iterator for RowIter<'a, T> {
@@ -9,8 +13,25 @@ impl<'a, T> Iterator for RowIter<'a, T> {
     }
 }
 
+impl<'a, T: 'static> PositionsEnumerator for RowIter<'a, T> {
+    fn positions(self) -> Positions<Self> {
+        Positions {
+            next_pos: Box::new(|inner, prev_pos| {
+                match prev_pos {
+                    None => (0, inner.idx),
+                    Some(p) => (p.0 + 1, p.1)
+                }
+            }),
+            prev_position: None,
+            inner: self
+        }
+    }
+}
+
+
 pub struct RowIterMut<'a, T> {
     pub(crate) row_iter: std::slice::IterMut<'a, T>,
+    pub(crate) idx: usize,
 }
 
 impl<'a, T> Iterator for RowIterMut<'a, T> {
@@ -20,9 +41,25 @@ impl<'a, T> Iterator for RowIterMut<'a, T> {
     }
 }
 
+impl <'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
+    fn positions(self) -> Positions<Self> {
+        Positions {
+            next_pos: Box::new(|inner, prev_pos| {
+                match prev_pos {
+                    None => (0, inner.idx),
+                    Some(p) => (p.0 + 1, p.1)
+                }
+            }),
+            prev_position: None,
+            inner: self,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::Grid;
+    use super::*;
 
     #[test]
     fn row_iter() {
@@ -51,6 +88,22 @@ mod tests {
     }
 
     #[test]
+    fn row_iter_positions() {
+        let grid = Grid {
+            width: 4,
+            height: 3,
+            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
+        };
+
+        let mut row_pos = grid.row(1).positions();
+        assert_eq!(row_pos.next(), Some(((0, 1), &1)));
+        assert_eq!(row_pos.next(), Some(((1, 1), &1)));
+        assert_eq!(row_pos.next(), Some(((2, 1), &1)));
+        assert_eq!(row_pos.next(), Some(((3, 1), &1)));
+        assert_eq!(row_pos.next(), None);
+    }
+
+    #[test]
     fn row_iter_mut() {
         let mut grid = Grid {
             width: 3,
@@ -74,5 +127,22 @@ mod tests {
         assert_eq!(row_iter.next(), Some(&mut 2));
         assert_eq!(row_iter.next(), Some(&mut 2));
         assert_eq!(row_iter.next(), None);
+    }
+
+
+    #[test]
+    fn row_iter_mut_positions() {
+        let mut grid = Grid {
+            width: 4,
+            height: 3,
+            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
+        };
+
+        let mut row_pos = grid.row_mut(1).positions();
+        assert_eq!(row_pos.next(), Some(((0, 1), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((1, 1), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((2, 1), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((3, 1), &mut 1)));
+        assert_eq!(row_pos.next(), None);
     }
 }

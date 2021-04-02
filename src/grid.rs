@@ -165,11 +165,12 @@ impl<T> Grid<T> {
     /// Panics if the row is out of bounds.
     pub fn row<'a>(&'a self, y: usize) -> RowIter<'a, T> {
         assert!(self.is_bounds(0, y));
-        let start_idx = y * self.height;
+        let start_idx = y * self.width;
         let end_idx = start_idx + self.width;
 
         RowIter {
             row_iter: self.cells[start_idx..end_idx].iter(),
+            idx: y,
         }
     }
 
@@ -180,11 +181,12 @@ impl<T> Grid<T> {
     /// Panics if the row is out of bounds.
     pub fn row_mut<'a>(&'a mut self, y: usize) -> RowIterMut<'a, T> {
         assert!(self.is_bounds(0, y));
-        let start_idx = y * self.height;
+        let start_idx = y * self.width;
         let end_idx = start_idx + self.width;
 
         RowIterMut {
             row_iter: self.cells[start_idx..end_idx].iter_mut(),
+            idx: y,
         }
     }
 
