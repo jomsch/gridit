@@ -62,14 +62,44 @@ mod tests {
     use super::*;
 
     #[test]
-    fn row_iter() {
-        let grid = Grid {
-            width: 3,
-            height: 3,
-            cells: vec![0, 0, 0, 1, 1, 1, 2, 2, 2],
+    fn row_iter_1x2() {
+        let grid =  Grid {
+            width: 1,
+            height: 2,
+            cells: vec![0, 1]
         };
+
         let mut row_iter = grid.row(0);
         assert_eq!(row_iter.next(), Some(&0));
+        assert_eq!(row_iter.next(), None);
+
+        let mut row_iter = grid.row(1);
+        assert_eq!(row_iter.next(), Some(&1));
+        assert_eq!(row_iter.next(), None);
+    }
+
+    #[test]
+    fn row_iter_2x1() {
+        let grid =  Grid {
+            width: 2,
+            height: 1,
+            cells: vec![0, 1]
+        };
+
+        let mut row_iter = grid.row(0);
+        assert_eq!(row_iter.next(), Some(&0));
+        assert_eq!(row_iter.next(), Some(&1));
+        assert_eq!(row_iter.next(), None);
+    }
+
+    #[test]
+    fn row_iter_2x2() {
+        let grid = Grid {
+            width: 2,
+            height: 2,
+            cells: vec![0, 0, 1, 1],
+        };
+        let mut row_iter = grid.row(0);
         assert_eq!(row_iter.next(), Some(&0));
         assert_eq!(row_iter.next(), Some(&0));
         assert_eq!(row_iter.next(), None);
@@ -77,13 +107,6 @@ mod tests {
         let mut row_iter = grid.row(1);
         assert_eq!(row_iter.next(), Some(&1));
         assert_eq!(row_iter.next(), Some(&1));
-        assert_eq!(row_iter.next(), Some(&1));
-        assert_eq!(row_iter.next(), None);
-
-        let mut row_iter = grid.row(2);
-        assert_eq!(row_iter.next(), Some(&2));
-        assert_eq!(row_iter.next(), Some(&2));
-        assert_eq!(row_iter.next(), Some(&2));
         assert_eq!(row_iter.next(), None);
     }
 
@@ -104,14 +127,44 @@ mod tests {
     }
 
     #[test]
-    fn row_iter_mut() {
-        let mut grid = Grid {
-            width: 3,
-            height: 3,
-            cells: vec![0, 0, 0, 1, 1, 1, 2, 2, 2],
+    fn row_iter_mut_1x2() {
+        let mut grid =  Grid {
+            width: 1,
+            height: 2,
+            cells: vec![0, 1]
         };
+
         let mut row_iter = grid.row_mut(0);
         assert_eq!(row_iter.next(), Some(&mut 0));
+        assert_eq!(row_iter.next(), None);
+
+        let mut row_iter = grid.row_mut(1);
+        assert_eq!(row_iter.next(), Some(&mut 1));
+        assert_eq!(row_iter.next(), None);
+    }
+
+    #[test]
+    fn row_iter_mut_2x1() {
+        let mut grid =  Grid {
+            width: 2,
+            height: 1,
+            cells: vec![0, 1]
+        };
+
+        let mut row_iter = grid.row_mut(0);
+        assert_eq!(row_iter.next(), Some(&mut 0));
+        assert_eq!(row_iter.next(), Some(&mut 1));
+        assert_eq!(row_iter.next(), None);
+    }
+
+    #[test]
+    fn row_iter_mut_2x2() {
+        let mut grid = Grid {
+            width: 2,
+            height: 2,
+            cells: vec![0, 0, 1, 1],
+        };
+        let mut row_iter = grid.row_mut(0);
         assert_eq!(row_iter.next(), Some(&mut 0));
         assert_eq!(row_iter.next(), Some(&mut 0));
         assert_eq!(row_iter.next(), None);
@@ -119,16 +172,8 @@ mod tests {
         let mut row_iter = grid.row_mut(1);
         assert_eq!(row_iter.next(), Some(&mut 1));
         assert_eq!(row_iter.next(), Some(&mut 1));
-        assert_eq!(row_iter.next(), Some(&mut 1));
-        assert_eq!(row_iter.next(), None);
-
-        let mut row_iter = grid.row_mut(2);
-        assert_eq!(row_iter.next(), Some(&mut 2));
-        assert_eq!(row_iter.next(), Some(&mut 2));
-        assert_eq!(row_iter.next(), Some(&mut 2));
         assert_eq!(row_iter.next(), None);
     }
-
 
     #[test]
     fn row_iter_mut_positions() {
