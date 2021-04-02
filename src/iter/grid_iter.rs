@@ -1,17 +1,4 @@
 use super::{Positions, PositionsEnumerator};
-use crate::grid::Position;
-
-fn next_position<'a, T>(inner: &GridIter<'a, T>, prev_pos: Option<Position>) -> Position {
-    let (px, py) = match prev_pos {
-        Some(xy) => xy,
-        None => return (0, 0),
-    };
-    let (x, y) = match px == (inner.width - 1) {
-        true => (0, py + 1),
-        false => (px + 1, py),
-    };
-    (x, y)
-}
 
 pub struct GridIter<'a, T> {
     pub(crate) grid_iter: std::slice::Iter<'a, T>,
@@ -29,20 +16,51 @@ impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
     fn positions(self) -> Positions<GridIter<'a, T>> {
         Positions {
             inner: self,
-            next_pos: Box::new(next_position),
             prev_position: None,
+            next_pos: Box::new(|inner, prev_pos| {
+                let (px, py) = match prev_pos {
+                    Some(xy) => xy,
+                    None => return (0, 0),
+                };
+                let (x, y) = match px == (inner.width - 1) {
+                    true => (0, py + 1),   // go one row down and reset x to 0
+                    false => (px + 1, py), // keep moving x forward
+                };
+                (x, y)
+            }),
         }
     }
 }
 
 pub struct GridIterMut<'a, T> {
     pub(crate) grid_iter: std::slice::IterMut<'a, T>,
+    pub(crate) width: usize,
 }
 
 impl<'a, T> Iterator for GridIterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
         self.grid_iter.next()
+    }
+}
+
+impl<'a, T: 'static> PositionsEnumerator for GridIterMut<'a, T> {
+    fn positions(self) -> Positions<Self> {
+        Positions {
+            inner: self,
+            prev_position: None,
+            next_pos: Box::new(|inner, prev_pos| {
+                let (px, py) = match prev_pos {
+                    Some(xy) => xy,
+                    None => return (0, 0),
+                };
+                let (x, y) = match px == (inner.width - 1) {
+                    true => (0, py + 1),   // go one row down and reset x to 0
+                    false => (px + 1, py), // keep moving x forward
+                };
+                (x, y)
+            }),
+        }
     }
 }
 
@@ -66,6 +84,18 @@ mod tests {
     }
 
     #[test]
+    fn grid_iter_positions() {
+        let grid = Grid::new(2, 2, 9usize);
+        let mut iter = grid.iter().positions();
+
+        assert_eq!(iter.next(), Some(((0, 0), &9)));
+        assert_eq!(iter.next(), Some(((1, 0), &9)));
+        assert_eq!(iter.next(), Some(((0, 1), &9)));
+        assert_eq!(iter.next(), Some(((1, 1), &9)));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
     fn grid_iter_mut() {
         let mut grid = Grid {
             width: 3,
@@ -81,14 +111,14 @@ mod tests {
     }
 
     #[test]
-    fn grid_iter_positions() {
-        let grid = Grid::new(2, 2, 9usize);
-        let mut iter = grid.iter().positions();
+    fn grid_iter_mut_positions() {
+        let mut grid = Grid::new(2, 2, 9usize);
+        let mut iter = grid.iter_mut().positions();
 
-        assert_eq!(iter.next(), Some(((0, 0), &9)));
-        assert_eq!(iter.next(), Some(((1, 0), &9)));
-        assert_eq!(iter.next(), Some(((0, 1), &9)));
-        assert_eq!(iter.next(), Some(((1, 1), &9)));
+        assert_eq!(iter.next(), Some(((0, 0), &mut 9)));
+        assert_eq!(iter.next(), Some(((1, 0), &mut 9)));
+        assert_eq!(iter.next(), Some(((0, 1), &mut 9)));
+        assert_eq!(iter.next(), Some(((1, 1), &mut 9)));
         assert_eq!(iter.next(), None);
     }
 }

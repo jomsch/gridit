@@ -1,5 +1,4 @@
 use super::{PositionsEnumerator, Positions};
-use crate::grid::Position;
 
 pub struct RowIter<'a, T> {
     pub(crate) row_iter: std::slice::Iter<'a, T>,

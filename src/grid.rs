@@ -155,6 +155,7 @@ impl<T> Grid<T> {
     pub fn iter_mut<'a>(&'a mut self) -> GridIterMut<'a, T> {
         GridIterMut {
             grid_iter: self.cells.iter_mut(),
+            width: self.width,
         }
     }
 
