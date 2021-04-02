@@ -199,8 +199,8 @@ impl<T> Grid<T> {
     pub fn column<'a>(&'a self, x: usize) -> ColumnIter<'a, T> {
         assert!(self.is_bounds(x, 0));
         ColumnIter {
-            idx: 0,
-            col: x,
+            row_idx: 0,
+            col_idx: x,
             grid: &self,
         }
     }
@@ -214,7 +214,7 @@ impl<T> Grid<T> {
         assert!(self.is_bounds(x, 0));
         let width = self.width;
         let iter = self.iter_mut().skip(x).step_by(width);
-        ColumnIterMut { column_iter: iter }
+        ColumnIterMut { iter, col_idx: x }
     }
 
     // Returns every valid neighbor position of x,y

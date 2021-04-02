@@ -1,10 +1,11 @@
 use crate::iter::GridIterMut;
 use crate::Grid;
 use std::iter::{Skip, StepBy};
+use super::{PositionsEnumerator, Positions};
 
 pub struct ColumnIter<'a, T> {
-    pub(crate) idx: usize,
-    pub(crate) col: usize,
+    pub(crate) row_idx: usize,
+    pub(crate) col_idx: usize,
     pub(crate) grid: &'a Grid<T>,
 }
 
@@ -12,21 +13,47 @@ impl<'a, T> Iterator for ColumnIter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.idx += 1;
-        self.grid.get(self.col, self.idx - 1)
+        self.row_idx += 1;
+        self.grid.get(self.col_idx, self.row_idx - 1)
+    }
+}
+
+impl<'a, T: 'static> PositionsEnumerator for ColumnIter<'a, T> {
+    fn positions(self) -> Positions<Self> {
+        Positions {
+            inner: self,
+            prev_position: None,
+            next_pos: Box::new(|inner, _| (inner.col_idx, inner.row_idx)),
+        }
     }
 }
 
 pub struct ColumnIterMut<'a, T> {
     // TODO change column_iter to be a more generic type that implements Iterator
-    pub(crate) column_iter: StepBy<Skip<GridIterMut<'a, T>>>,
+    pub(crate) iter: StepBy<Skip<GridIterMut<'a, T>>>,
+    pub(crate) col_idx: usize,
 }
 
 impl<'a, T> Iterator for ColumnIterMut<'a, T> {
     type Item = &'a mut T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.column_iter.next()
+        self.iter.next()
+    }
+}
+
+impl<'a, T: 'static> PositionsEnumerator for ColumnIterMut<'a, T> {
+    fn positions(self) -> Positions<Self> {
+        Positions {
+            inner: self,
+            prev_position: None,
+            next_pos: Box::new(|inner, prev_pos| {
+                match prev_pos {
+                    None => (inner.col_idx, 0),
+                    Some(p) => (p.0, p.1 + 1),
+                }
+            }),
+        }
     }
 }
 
@@ -54,6 +81,25 @@ mod tests {
     }
 
     #[test]
+    fn column_iter_positions() {
+        let grid = Grid {
+            width: 2,
+            height: 2,
+            cells: vec![0, 1, 0, 1],
+        };
+
+        let mut col_pos = grid.column(0).positions();
+        assert_eq!(col_pos.next(), Some(((0, 0), &0)));
+        assert_eq!(col_pos.next(), Some(((0, 1), &0)));
+        assert_eq!(col_pos.next(), None);
+
+        let mut col_pos = grid.column(1).positions();
+        assert_eq!(col_pos.next(), Some(((1, 0), &1)));
+        assert_eq!(col_pos.next(), Some(((1, 1), &1)));
+        assert_eq!(col_pos.next(), None);
+    }
+
+    #[test]
     fn column_iter_mut() {
         let mut grid = Grid {
             width: 2,
@@ -70,5 +116,25 @@ mod tests {
         assert_eq!(col_iter.next(), Some(&mut 1));
         assert_eq!(col_iter.next(), Some(&mut 1));
         assert_eq!(col_iter.next(), None);
+    }
+
+    #[test]
+    fn column_iter_mut_positions() {
+        let mut grid = Grid {
+            width: 2,
+            height: 2,
+            cells: vec![0, 1, 0, 1],
+        };
+
+        let mut col_pos = grid.column_mut(0).positions();
+        assert_eq!(col_pos.next(), Some(((0, 0), &mut 0)));
+        assert_eq!(col_pos.next(), Some(((0, 1), &mut 0)));
+        assert_eq!(col_pos.next(), None);
+        drop(col_pos);
+
+        let mut col_pos = grid.column_mut(1).positions();
+        assert_eq!(col_pos.next(), Some(((1, 0), &mut 1)));
+        assert_eq!(col_pos.next(), Some(((1, 1), &mut 1)));
+        assert_eq!(col_pos.next(), None);
     }
 }
