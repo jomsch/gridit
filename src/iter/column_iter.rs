@@ -23,7 +23,7 @@ impl<'a, T: 'static> PositionsEnumerator for ColumnIter<'a, T> {
         Positions {
             inner: self,
             prev_position: None,
-            next_pos: Box::new(|inner, _| (inner.col_idx, inner.row_idx)),
+            next_pos: |inner, _| (inner.col_idx, inner.row_idx),
         }
     }
 }
@@ -47,12 +47,12 @@ impl<'a, T: 'static> PositionsEnumerator for ColumnIterMut<'a, T> {
         Positions {
             inner: self,
             prev_position: None,
-            next_pos: Box::new(|inner, prev_pos| {
+            next_pos: |inner, prev_pos| {
                 match prev_pos {
                     None => (inner.col_idx, 0),
                     Some(p) => (p.0, p.1 + 1),
                 }
-            }),
+            },
         }
     }
 }
@@ -130,7 +130,6 @@ mod tests {
         assert_eq!(col_pos.next(), Some(((0, 0), &mut 0)));
         assert_eq!(col_pos.next(), Some(((0, 1), &mut 0)));
         assert_eq!(col_pos.next(), None);
-        drop(col_pos);
 
         let mut col_pos = grid.column_mut(1).positions();
         assert_eq!(col_pos.next(), Some(((1, 0), &mut 1)));

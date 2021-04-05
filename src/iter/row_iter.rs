@@ -15,12 +15,12 @@ impl<'a, T> Iterator for RowIter<'a, T> {
 impl<'a, T: 'static> PositionsEnumerator for RowIter<'a, T> {
     fn positions(self) -> Positions<Self> {
         Positions {
-            next_pos: Box::new(|inner, prev_pos| {
+            next_pos: |inner, prev_pos| {
                 match prev_pos {
                     None => (0, inner.idx),
                     Some(p) => (p.0 + 1, p.1)
                 }
-            }),
+            },
             prev_position: None,
             inner: self
         }
@@ -43,12 +43,12 @@ impl<'a, T> Iterator for RowIterMut<'a, T> {
 impl <'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
     fn positions(self) -> Positions<Self> {
         Positions {
-            next_pos: Box::new(|inner, prev_pos| {
+            next_pos: |inner, prev_pos| {
                 match prev_pos {
                     None => (0, inner.idx),
                     Some(p) => (p.0 + 1, p.1)
                 }
-            }),
+            },
             prev_position: None,
             inner: self,
         }
@@ -187,6 +187,13 @@ mod tests {
         assert_eq!(row_pos.next(), Some(((1, 1), &mut 1)));
         assert_eq!(row_pos.next(), Some(((2, 1), &mut 1)));
         assert_eq!(row_pos.next(), Some(((3, 1), &mut 1)));
+        assert_eq!(row_pos.next(), None);
+
+        let mut row_pos = grid.row_mut(0).positions();
+        assert_eq!(row_pos.next(), Some(((0, 0), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((1, 0), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((2, 0), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((3, 0), &mut 0)));
         assert_eq!(row_pos.next(), None);
     }
 }

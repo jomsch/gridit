@@ -17,7 +17,7 @@ impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
         Positions {
             inner: self,
             prev_position: None,
-            next_pos: Box::new(|inner, prev_pos| {
+            next_pos: |inner, prev_pos| {
                 let (px, py) = match prev_pos {
                     Some(xy) => xy,
                     None => return (0, 0),
@@ -27,7 +27,7 @@ impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
                     false => (px + 1, py), // keep moving x forward
                 };
                 (x, y)
-            }),
+            },
         }
     }
 }
@@ -49,7 +49,7 @@ impl<'a, T: 'static> PositionsEnumerator for GridIterMut<'a, T> {
         Positions {
             inner: self,
             prev_position: None,
-            next_pos: Box::new(|inner, prev_pos| {
+            next_pos: |inner, prev_pos| {
                 let (px, py) = match prev_pos {
                     Some(xy) => xy,
                     None => return (0, 0),
@@ -59,7 +59,7 @@ impl<'a, T: 'static> PositionsEnumerator for GridIterMut<'a, T> {
                     false => (px + 1, py), // keep moving x forward
                 };
                 (x, y)
-            }),
+            },
         }
     }
 }

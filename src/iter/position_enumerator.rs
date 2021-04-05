@@ -2,7 +2,7 @@ use crate::grid::Position;
 
 pub struct Positions<I> {
     pub(crate) inner: I,
-    pub(crate) next_pos: Box<dyn Fn(&I, Option<Position>) -> Position>,
+    pub(crate) next_pos: fn(&I, Option<Position>) -> Position,
     pub(crate) prev_position: Option<Position>,
 }
 
