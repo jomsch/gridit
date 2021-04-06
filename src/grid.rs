@@ -260,8 +260,9 @@ impl<T> Grid<T> {
     pub fn neighbors<'a>(&'a self, x: usize, y: usize) -> NeighborIter<'a, T> {
         assert!(self.is_bounds(x, y));
         NeighborIter {
-            positions: Box::new(self.get_neighbor_positions(x, y).into_iter()),
+            positions: self.get_neighbor_positions(x, y),
             grid: &self,
+            idx: 0,
         }
     }
 
