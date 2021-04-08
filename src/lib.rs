@@ -1,6 +1,7 @@
 mod builder;
 mod grid;
 mod iter;
+mod pattern;
 
 pub use builder::GridBuilder;
 pub use grid::Grid;
