@@ -1,14 +1,7 @@
 use super::iter::*;
+use super::pattern::Pattern;
+use super::step::N;
 use std::mem;
-
-// Utility Enum for storing Negative(N) and Positive(P) as usize
-#[derive(Clone)]
-enum N {
-    //Negative Number
-    N(usize),
-    //Positive Number
-    P(usize),
-}
 
 pub type Position = (usize, usize);
 
@@ -273,7 +266,7 @@ impl<T> Grid<T> {
     //     }
     // }
 
-    // pub fn pattern<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
+    // pub fn pattern(&self, x: usize, y: usize, p: Pattern) -> PatternIter {
     //     unimplemented!()
     // }
 

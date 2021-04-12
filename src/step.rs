@@ -1,0 +1,62 @@
+// Utility Enum for storing Negative(N) and Positive(P) as usize
+#[derive(Clone, Debug)]
+pub(crate) enum N {
+    //Negative Number
+    N(usize),
+    //Positive Number
+    P(usize),
+}
+
+impl N {
+    fn get_number(&self) -> usize {
+        match self {
+            N::N(n) => *n,
+            N::P(n) => *n,
+        }
+    }
+
+    fn from_isize(n: isize) -> Self {
+        if n < 0 {
+            return N::N((n*-1) as usize);
+        }
+        N::P(n as usize)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct Step {
+    x: N, 
+    y: N,
+}
+
+impl Step {
+    pub fn new(x: usize, y: usize) -> Self {
+        Step { x: N::P(x), y: N::P(y) }
+    }
+
+    pub fn negate_x(mut self) -> Self {
+        self.x = N::N(self.x.get_number());
+        self
+    }
+
+    pub fn negate_y(mut self) -> Self {
+        self.y = N::N(self.y.get_number());
+        self
+    }
+}
+// TODO Create a better impl for all Numbers T -> (T, T)
+impl From<(usize, usize)> for Step {
+    fn from((x, y): (usize, usize)) -> Self {
+        Step::new(x, y) 
+    }
+}
+
+// TODO Create a better impl for all Numbers T -> (T, T) where T: Neg or something likes this
+impl From<(isize, isize)> for Step {
+    fn from((x, y): (isize, isize)) -> Self {
+        Step {
+            x: N::from_isize(x),
+            y: N::from_isize(y),
+        }
+    }
+}
