@@ -1,3 +1,4 @@
+use super::Position;
 // Utility Enum for storing Negative(N) and Positive(P) as usize
 #[derive(Copy, Clone, Debug)]
 pub(crate) enum N {
@@ -21,6 +22,15 @@ impl N {
         }
         N::P(n as usize)
     }
+
+    pub(crate) fn checked_add_sub(&self, n: usize) -> Option<usize> {
+        Some(
+        match self {
+            N::N(pn) => n.checked_sub(*pn)?,
+            N::P(pn) => n.checked_add(*pn)?,
+        }
+        )
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -43,7 +53,14 @@ impl Step {
         self.y = N::N(self.y.get_number());
         self
     }
+
+    pub(crate) fn take_step_from_position(&self, (px, py): Position) -> Option<Position> {
+        let x = self.x.checked_add_sub(px)?;
+        let y = self.y.checked_add_sub(py)?;
+        Some((x, y))
+    }
 }
+
 // TODO Create a better impl for all Numbers T -> (T, T)
 impl From<(usize, usize)> for Step {
     fn from((x, y): (usize, usize)) -> Self {

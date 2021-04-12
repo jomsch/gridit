@@ -226,14 +226,8 @@ impl<T> Grid<T> {
         let valid_positions: Vec<Position> = neighbor_position
             .iter()
             .filter_map(|(nx, ny)| {
-                let x = match nx {
-                    N::N(px) => x.checked_sub(*px)?,
-                    N::P(px) => x.checked_add(*px)?,
-                };
-                let y = match ny {
-                    N::N(py) => y.checked_sub(*py)?,
-                    N::P(py) => y.checked_add(*py)?,
-                };
+                let x = nx.checked_add_sub(x)?;
+                let y = ny.checked_add_sub(y)?;
 
                 if self.get(x, y).is_some() {
                     return Some((x, y));
