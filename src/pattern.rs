@@ -19,9 +19,9 @@ pub struct DirectionPattern {
 }
 
 impl DirectionPattern {
-    pub fn new(step: Step, repeat: Repeat) -> Self {
+    pub fn new<S: Into<Step>>(step: S, repeat: Repeat) -> Self {
         Self {
-            step,
+            step: step.into(),
             repeat,
         }
     }
@@ -60,4 +60,6 @@ impl Pattern for SequencePattern {
         &Repeat::TillEnd
     }
 }
+
+
 

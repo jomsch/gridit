@@ -260,9 +260,14 @@ impl<T> Grid<T> {
     //     }
     // }
 
-    // pub fn pattern(&self, x: usize, y: usize, p: Pattern) -> PatternIter {
-    //     unimplemented!()
-    // }
+    pub fn pattern<'a, P: Pattern + 'static>(&'a self, x: usize, y: usize, p: P) -> PatternIter<'a, T> {
+        PatternIter {
+            grid: &self,
+            prev_position: (x, y),
+            pattern: Box::new(p),
+            repeat_count: 0,
+        }
+    }
 
     // pub fn pattern_mut<P: Pattern>(&self, x: usize, y: usize, p: P) -> PatternIter {
     //     unimplemented!()
