@@ -1,65 +1,63 @@
-#[derive(Clone, Debug)]
-pub enum Direction {
-    YP,
-    YN,
-    XN,
-    XP,
-    All,
-    XAll,
-    YAll,
+use crate::Step;
+
+pub trait Pattern {
+    fn next_step(&mut self) -> Option<Step>;
+    fn repeat(&self) -> &Repeat;
 }
 
 #[derive(Clone, Debug)]
-pub struct Pattern {
-    pub(crate) step: (usize, usize),
-    pub(crate) directions: Vec<Direction>, 
+pub enum Repeat {
+    Once,
+    TillEnd,
+    Times(usize),
 }
 
-impl Pattern {
-    pub fn new(step: (usize, usize), directions: impl Into<Vec<Direction>>) -> Self {
-        let directions = directions.into();
-        if directions.is_empty() {
-            panic!("Can't build pattern without direction");
-        }
-        Pattern {
+#[derive(Clone, Debug)]
+pub struct DirectionPattern {
+    pub(crate) step: Step,
+    pub(crate) repeat: Repeat,
+}
+
+impl DirectionPattern {
+    pub fn new(step: Step, repeat: Repeat) -> Self {
+        Self {
             step,
-            directions: directions.into(),
+            repeat,
         }
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct PatternBuilder {
-    pub(crate) step: (usize, usize),
-    pub(crate) directions: Vec<Direction>,
+impl Pattern for DirectionPattern {
+    fn next_step(&mut self) -> Option<Step> {
+        Some(self.step)
+    }
+
+    fn repeat(&self) -> &Repeat {
+        &self.repeat
+    }
+
 }
 
-impl PatternBuilder {
-    pub fn new(step_x: usize, step_y: usize) -> Self {
-        PatternBuilder {
-            step: (step_x, step_y),
-            directions: Vec::new(),
-        }
-    }
+pub struct SequencePattern {
+    pub(crate) steps: Box<dyn Iterator<Item = Step>>,
+}
 
-    pub fn add_direction(mut self, direction: Direction) -> Self {
-        self.directions.push(direction);
-        self
-    }
-
-    
-    pub fn add_directions(mut self, directions: &[Direction]) -> Self {
-        self.directions.extend_from_slice(directions);
-        self
-    }
-
-    pub fn build(self) -> Pattern {
-        if self.directions.is_empty() {
-            panic!("Can't build Pattern without direction");
-        }
-        Pattern {
-            step: self.step,
-            directions: self.directions,
-        }
+impl SequencePattern {
+    pub fn new<I>(sequence: I) -> Self 
+    where
+        I: IntoIterator<Item = Step> + 'static,
+    {
+        Self { steps: Box::new(sequence.into_iter()) }
     }
 }
+
+impl Pattern for SequencePattern {
+    fn next_step(&mut self) -> Option<Step> {
+        self.steps.next()   
+    }
+
+    fn repeat(&self) -> &Repeat {
+        &Repeat::TillEnd
+    }
+}
+

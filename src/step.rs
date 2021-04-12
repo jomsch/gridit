@@ -1,5 +1,5 @@
 // Utility Enum for storing Negative(N) and Positive(P) as usize
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub(crate) enum N {
     //Negative Number
     N(usize),
@@ -23,7 +23,7 @@ impl N {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Step {
     x: N, 
     y: N,
