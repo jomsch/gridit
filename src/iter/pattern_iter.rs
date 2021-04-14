@@ -27,7 +27,6 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
         let step = self.pattern.next_step()?;
         let next_position = step.take_step_from_position(self.prev_position)?;
         let (nx, ny) = next_position;
-
         let cell = self.grid.get(nx, ny)?;
         self.repeat_count += 1;
         self.prev_position = next_position;
@@ -39,6 +38,7 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
 mod test {
     use super::*;
     use crate::pattern::{SequencePattern, DirectionPattern};
+    use crate::Step;
 
     // 0, 1, 2, 3
     // 4, 5, 6, 7
@@ -102,6 +102,53 @@ mod test {
         let pattern = DirectionPattern::new((-1isize, 0), Repeat::Once);
         let mut iter = grid.pattern(2, 3, pattern);
         assert_eq!(iter.next(), Some(&13));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn pattern_iter_sequence() {
+        let grid = Grid {
+            width: 3,
+            height:3,
+            cells: (0..9).collect(),
+        };
+
+        let seq: Vec<(isize, isize)> = vec![(0, -1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0)];
+        let pattern = SequencePattern::new(seq.into_iter().map(Step::from));
+        let mut iter = grid.pattern(0, 1, pattern);
+
+        assert_eq!(iter.next(), Some(&0));
+        assert_eq!(iter.next(), Some(&1));
+        assert_eq!(iter.next(), Some(&2));
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), Some(&4));
+        assert_eq!(iter.next(), Some(&5));
+        assert_eq!(iter.next(), Some(&6));
+        assert_eq!(iter.next(), Some(&7));
+        assert_eq!(iter.next(), Some(&8));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn pattern_iter_sequence_cross() {
+        let grid = Grid {
+            width: 3,
+            height:3,
+            cells: (0..9).collect(),
+        };
+
+        let seq: Vec<(isize, isize)> = vec![(0, -1), (0, 1), (1, 0), (-1, 0), (0, 1), (0, -1), (-1, 0), (1, 0)];
+        let pattern = SequencePattern::new(seq.into_iter().map(Step::from));
+        let mut iter = grid.pattern(1, 1, pattern);
+
+        assert_eq!(iter.next(), Some(&1));
+        assert_eq!(iter.next(), Some(&4));
+        assert_eq!(iter.next(), Some(&5));
+        assert_eq!(iter.next(), Some(&4));
+        assert_eq!(iter.next(), Some(&7));
+        assert_eq!(iter.next(), Some(&4));
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), Some(&4));
         assert_eq!(iter.next(), None);
     }
 }
