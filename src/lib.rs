@@ -1,8 +1,8 @@
 mod builder;
 mod grid;
 mod iter;
-mod pattern;
 mod step;
+pub mod pattern;
 
 pub use builder::GridBuilder;
 pub use grid::{Grid, Position};

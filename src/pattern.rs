@@ -2,6 +2,7 @@ use crate::Step;
 
 pub trait Pattern {
     fn next_step(&mut self) -> Option<Step>;
+    fn next_step_peek(&self) -> Option<Step>;
     fn repeat(&self) -> &Repeat;
 }
 
@@ -32,34 +33,43 @@ impl Pattern for DirectionPattern {
         Some(self.step)
     }
 
+    fn next_step_peek(&self) -> Option<Step> {
+        Some(self.step)
+    }
+
     fn repeat(&self) -> &Repeat {
         &self.repeat
     }
 
 }
 
+
 pub struct SequencePattern {
-    pub(crate) steps: Box<dyn Iterator<Item = Step>>,
+    pub(crate) steps: Vec<Step>,
+    pub(crate) idx: usize,
 }
 
 impl SequencePattern {
-    pub fn new<I>(sequence: I) -> Self 
-    where
-        I: IntoIterator<Item = Step> + 'static,
+    pub fn new<T: Copy + Into<Step>>(sequence: Vec<T>) -> Self 
     {
-        Self { steps: Box::new(sequence.into_iter()) }
+        Self { 
+            steps: sequence.iter().map(|t| (*t).into()).collect(), 
+            idx: 0 
+        }
     }
 }
 
 impl Pattern for SequencePattern {
     fn next_step(&mut self) -> Option<Step> {
-        self.steps.next()   
+        self.idx += 1;
+        Some(*self.steps.get(self.idx -1)?)
+    }
+
+    fn next_step_peek(&self) -> Option<Step> {
+        Some(*self.steps.get(self.idx)?)
     }
 
     fn repeat(&self) -> &Repeat {
         &Repeat::TillEnd
     }
 }
-
-
-
