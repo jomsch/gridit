@@ -84,7 +84,7 @@ mod test {
             cells: (0..16).collect(), 
         };
 
-        let pattern = DirectionPattern::new((0isize, 1), Repeat::Times(2));
+        let pattern = DirectionPattern::new((0, 1), Repeat::Times(2));
         let mut iter = grid.pattern(0, 0, pattern);
         assert_eq!(iter.next(), Some(&4));
         assert_eq!(iter.next(), Some(&8));
@@ -99,7 +99,7 @@ mod test {
             cells: (0..16).collect(), 
         };
 
-        let pattern = DirectionPattern::new((-1isize, 0), Repeat::Once);
+        let pattern = DirectionPattern::new((-1, 0), Repeat::Once);
         let mut iter = grid.pattern(2, 3, pattern);
         assert_eq!(iter.next(), Some(&13));
         assert_eq!(iter.next(), None);
@@ -113,7 +113,7 @@ mod test {
             cells: (0..9).collect(),
         };
 
-        let seq: Vec<(isize, isize)> = vec![(0, -1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0)];
+        let seq: Vec<(i32, i32)> = vec![(0, -1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0)];
         let pattern = SequencePattern::new(seq.into_iter().map(Step::from));
         let mut iter = grid.pattern(0, 1, pattern);
 
@@ -137,7 +137,7 @@ mod test {
             cells: (0..9).collect(),
         };
 
-        let seq: Vec<(isize, isize)> = vec![(0, -1), (0, 1), (1, 0), (-1, 0), (0, 1), (0, -1), (-1, 0), (1, 0)];
+        let seq: Vec<(i32, i32)> = vec![(0, -1), (0, 1), (1, 0), (-1, 0), (0, 1), (0, -1), (-1, 0), (1, 0)];
         let pattern = SequencePattern::new(seq.into_iter().map(Step::from));
         let mut iter = grid.pattern(1, 1, pattern);
 

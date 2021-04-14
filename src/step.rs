@@ -23,6 +23,13 @@ impl N {
         N::P(n as usize)
     }
 
+    fn from_i32(n: i32) -> Self {
+        if n < 0 {
+            return N::N((n*-1) as usize);
+        }
+        N::P(n as usize)
+    }
+
     pub(crate) fn checked_add_sub(&self, n: usize) -> Option<usize> {
         Some(
         match self {
@@ -74,6 +81,15 @@ impl From<(isize, isize)> for Step {
         Step {
             x: N::from_isize(x),
             y: N::from_isize(y),
+        }
+    }
+}
+
+impl From<(i32, i32)> for Step {
+    fn from((x, y): (i32, i32)) -> Self {
+        Step {
+            x: N::from_i32(x),
+            y: N::from_i32(y),
         }
     }
 }
