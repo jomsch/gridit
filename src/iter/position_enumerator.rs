@@ -6,7 +6,7 @@ pub struct Positions<I> {
     pub(crate) prev_position: Option<Position>,
 }
 
-pub(crate) trait PositionsEnumerator
+pub trait PositionsEnumerator
 where
     Self: Sized,
 {

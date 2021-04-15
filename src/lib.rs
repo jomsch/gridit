@@ -7,6 +7,7 @@ pub mod pattern;
 pub use builder::GridBuilder;
 pub use grid::{Grid, Position};
 pub use step::Step;
+pub use iter::*;
 
 #[cfg(test)]
 mod tests {

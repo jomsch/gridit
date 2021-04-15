@@ -6,7 +6,7 @@ mod position_iter;
 mod row_iter;
 mod pattern_iter;
 
-pub(crate) use position_enumerator::{Positions, PositionsEnumerator};
+pub use position_enumerator::{Positions, PositionsEnumerator};
 pub use column_iter::{ColumnIter, ColumnIterMut};
 pub use grid_iter::{GridIter, GridIterMut};
 pub use neighbor_iter::NeighborIter;
