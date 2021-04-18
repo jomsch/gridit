@@ -6,6 +6,10 @@ use ggez::{graphics, Context, ContextBuilder, GameResult};
 use gridit::Grid;
 use gridit::PositionsEnumerator;
 
+const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
+const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
+
+
 fn main() {
     let (mut ctx, mut event_loop) = ContextBuilder::new("pawn_example", "")
         .build()
@@ -30,6 +34,9 @@ struct Board(Grid<Field>);
 impl Drawable for Board {
     fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult<()> {
         let (width, height) = size(&ctx);
+        let padding = 50.0;
+        let width = width - padding * 2.0;
+        let height = height - padding * 2.0;
         let rect_w = width / 8.0;
         let rect_h = height / 8.0;
 
@@ -37,7 +44,7 @@ impl Drawable for Board {
             let (x, y) = (x as f32, y as f32);
             let rect_x = x * rect_w;
             let rect_y = y * rect_h;
-            let rect = Rect::new(rect_x, rect_y, rect_w, rect_h);
+            let rect = Rect::new(rect_x+padding, rect_y+padding, rect_w, rect_h);
             let mrect = Mesh::new_rectangle(
                 ctx,
                 DrawMode::Fill(FillOptions::default()),
@@ -72,16 +79,16 @@ impl ChessGame {
             8,
             8,
             Field {
-                default_color: Color::BLACK,
-                bg_color: Color::BLACK,
+                default_color: BLACK,
+                bg_color: BLACK,
                 piece: None,
             },
         );
 
         for (_, field) in grid.iter_mut().positions().filter(|((x, y), _)| (x + y) % 2 == 0)
         {
-            field.default_color = Color::WHITE;
-            field.bg_color = Color::WHITE;
+            field.default_color = WHITE;
+            field.bg_color = WHITE;
         }
 
         Self { board: Board(grid) }
