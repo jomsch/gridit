@@ -1,13 +1,11 @@
 use ggez::event::{self, EventHandler};
-use ggez::graphics::{
-    size, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Mesh, Rect,
-};
+use ggez::graphics::DrawParam;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use gridit::Grid;
 use gridit::PositionsEnumerator;
 
-const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
-const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
+mod board;
+use crate::board::*;
 
 
 fn main() {
@@ -15,65 +13,15 @@ fn main() {
         .build()
         .expect("Could not create context");
 
-    let mut game = ChessGame::new(&mut ctx);
+    let mut game = BoardGame::new(&mut ctx);
     event::run(ctx, event_loop, game);
 }
 
-#[derive(Clone, Debug)]
-struct Piece;
-
-#[derive(Clone, Debug)]
-struct Field {
-    bg_color: Color,
-    default_color: Color,
-    piece: Option<Piece>,
-}
-
-struct Board(Grid<Field>);
-
-impl Drawable for Board {
-    fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult<()> {
-        let (width, height) = size(&ctx);
-        let padding = 50.0;
-        let width = width - padding * 2.0;
-        let height = height - padding * 2.0;
-        let rect_w = width / 8.0;
-        let rect_h = height / 8.0;
-
-        for ((x, y), field) in self.0.iter().positions() {
-            let (x, y) = (x as f32, y as f32);
-            let rect_x = x * rect_w;
-            let rect_y = y * rect_h;
-            let rect = Rect::new(rect_x+padding, rect_y+padding, rect_w, rect_h);
-            let mrect = Mesh::new_rectangle(
-                ctx,
-                DrawMode::Fill(FillOptions::default()),
-                rect,
-                field.bg_color,
-            )?;
-            graphics::draw(ctx, &mrect, DrawParam::default());
-        }
-
-        Ok(())
-    }
-
-    fn dimensions(&self, ctx: &mut Context) -> Option<Rect> {
-        let (width, height) = size(&ctx);
-        Some(Rect::new(0.0, 0.0, width, height))
-    }
-
-    fn set_blend_mode(&mut self, mode: Option<BlendMode>) {}
-
-    fn blend_mode(&self) -> Option<BlendMode> {
-        None
-    }
-}
-
-struct ChessGame {
+struct BoardGame {
     board: Board,
 }
 
-impl ChessGame {
+impl BoardGame {
     fn new(_ctx: &mut Context) -> Self {
         let mut grid = Grid::new(
             8,
@@ -91,17 +39,17 @@ impl ChessGame {
             field.bg_color = WHITE;
         }
 
-        Self { board: Board(grid) }
+        Self { board: Board::new(grid, (50.0, 50.0), 400.0) }
     }
 }
 
-impl EventHandler for ChessGame {
+impl EventHandler for BoardGame {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, graphics::Color::WHITE);
+        graphics::clear(ctx, graphics::Color::new(0.25, 0.25, 0.25, 1.0));
         graphics::draw(ctx, &self.board, DrawParam::default());
         graphics::present(ctx)
     }
