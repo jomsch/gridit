@@ -52,6 +52,20 @@ impl BoardGame {
             hdpi_factor,
         }
     }
+
+    fn resize_board(&mut self, ctx: &Context) {
+        let hdpi_factor = graphics::window(ctx).scale_factor() as f32;
+        let (x, y) = graphics::size(ctx);
+        let size = if x >= y {
+            y
+        } else {
+            x
+        };
+        let padding = 50.0;
+        let draw_rect = Rect::new(padding, padding, size*hdpi_factor-(padding*2.), size*hdpi_factor-(padding*2.));
+        // let draw_rect = Rect::new(0.0, 0.0, size*hdpi_factor, size*hdpi_factor);
+        self.board.set_rect(draw_rect);
+    }
 }
 
 impl EventHandler for BoardGame {
@@ -75,14 +89,18 @@ impl EventHandler for BoardGame {
         graphics::clear(ctx, graphics::Color::new(0.25, 0.25, 0.25, 1.0));
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
         if self.has_resized || self.hdpi_factor != hdpi_factor {
-            let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
             let (x, y) = graphics::size(&ctx);
             let draw_rect = Rect::new(0.0, 0.0, x*hdpi_factor, y*hdpi_factor);
             graphics::set_screen_coordinates(ctx, draw_rect)?;
+            self.resize_board(ctx);
             self.has_resized = false;
         }
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;
         graphics::present(ctx)
+    }
+
+    fn resize_event(&mut self, _ctx: &mut Context, _width: f32, _height: f32) {
+        self.has_resized = true;        
     }
 }
