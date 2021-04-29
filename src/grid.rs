@@ -24,6 +24,20 @@ impl<T: Clone> Grid<T> {
     }
 }
 
+impl<T: Default> Grid<T> {
+    /// Sets the element at position x,y to the default value of T  
+    /// returns the old value of x,y
+    /// or None if x or y is out of bounds
+    pub fn replace_default(&mut self, x: usize, y: usize) -> Option<T> {
+        if self.is_bounds(x, y) {
+            let idx = self.translate(x, y);
+            let old = mem::replace(&mut self.cells[idx], T::default());
+            return Some(old);
+        }
+        None
+    }
+}
+
 impl<T> Grid<T> {
     #[inline]
     fn translate(&self, x: usize, y: usize) -> usize {
