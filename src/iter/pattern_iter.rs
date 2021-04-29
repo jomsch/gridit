@@ -27,8 +27,7 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
         self.repeation_done()?;
         let step = self.pattern.next_step()?;
         let next_position = step.take_step_from_position(self.prev_position)?;
-        let (nx, ny) = next_position;
-        let cell = self.grid.get(nx, ny)?;
+        let cell = self.grid.get(next_position)?;
         self.repeat_count += 1;
         self.prev_position = next_position;
         Some(cell)
@@ -72,7 +71,7 @@ mod test {
         };
 
         let pattern = DirectionPattern::new((0isize, -1), Repeat::TillEnd);
-        let mut iter = grid.pattern(2, 3, pattern);
+        let mut iter = grid.pattern((2, 3), pattern);
         assert_eq!(iter.next(), Some(&10));
         assert_eq!(iter.next(), Some(&6));
         assert_eq!(iter.next(), Some(&2));
@@ -88,7 +87,7 @@ mod test {
         };
 
         let pattern = DirectionPattern::new((1isize, 0), Repeat::TillEnd);
-        let mut iter = grid.pattern(0, 2, pattern);
+        let mut iter = grid.pattern((0, 2), pattern);
         assert_eq!(iter.next(), Some(&9));
         assert_eq!(iter.next(), Some(&10));
         assert_eq!(iter.next(), Some(&11));
@@ -104,7 +103,7 @@ mod test {
         };
 
         let pattern = DirectionPattern::new((0, 1), Repeat::Times(2));
-        let mut iter = grid.pattern(0, 0, pattern);
+        let mut iter = grid.pattern((0, 0), pattern);
         assert_eq!(iter.next(), Some(&4));
         assert_eq!(iter.next(), Some(&8));
         assert_eq!(iter.next(), None);
@@ -119,7 +118,7 @@ mod test {
         };
 
         let pattern = DirectionPattern::new((-1, 0), Repeat::Once);
-        let mut iter = grid.pattern(2, 3, pattern);
+        let mut iter = grid.pattern((2, 3), pattern);
         assert_eq!(iter.next(), Some(&13));
         assert_eq!(iter.next(), None);
     }
@@ -133,9 +132,9 @@ mod test {
         };
 
         let pattern = DirectionPattern::new((-1, -1), Repeat::Times(2));
-        let mut iter = grid.pattern(3, 3, pattern).positions();
-        assert_eq!(iter.next(), Some(((2, 2), &10)));
-        assert_eq!(iter.next(), Some(((1, 1), &5)));
+        let mut iter = grid.pattern((3, 3), pattern).positions();
+        assert_eq!(iter.next(), Some(((2, 2).into(), &10)));
+        assert_eq!(iter.next(), Some(((1, 1).into(), &5)));
         assert_eq!(iter.next(), None);
     }
 
@@ -149,7 +148,7 @@ mod test {
 
         let seq: Vec<(i32, i32)> = vec![(0, -1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0), (-2, 1), (1, 0), (1, 0)];
         let pattern = SequencePattern::new(seq);
-        let mut iter = grid.pattern(0, 1, pattern);
+        let mut iter = grid.pattern((0, 1), pattern);
 
         assert_eq!(iter.next(), Some(&0));
         assert_eq!(iter.next(), Some(&1));
@@ -173,7 +172,7 @@ mod test {
 
         let seq: Vec<(i32, i32)> = vec![(0, -1), (0, 1), (1, 0), (-1, 0), (0, 1), (0, -1), (-1, 0), (1, 0)];
         let pattern = SequencePattern::new(seq);
-        let mut iter = grid.pattern(1, 1, pattern);
+        let mut iter = grid.pattern((1, 1), pattern);
 
         assert_eq!(iter.next(), Some(&1));
         assert_eq!(iter.next(), Some(&4));
@@ -197,11 +196,11 @@ mod test {
         let seq: Vec<(i32, i32)> = vec![(1, 0), (0, 1), (-1, 0), (0, -1)];
         let pattern = SequencePattern::new(seq);
 
-        let mut iter = grid.pattern(0, 1, pattern).positions();
-        assert_eq!(iter.next(), Some(((1, 1), &3)));
-        assert_eq!(iter.next(), Some(((1, 2), &5)));
-        assert_eq!(iter.next(), Some(((0, 2), &4)));
-        assert_eq!(iter.next(), Some(((0, 1), &2)));
+        let mut iter = grid.pattern((0, 1), pattern).positions();
+        assert_eq!(iter.next(), Some(((1, 1).into(), &3)));
+        assert_eq!(iter.next(), Some(((1, 2).into(), &5)));
+        assert_eq!(iter.next(), Some(((0, 2).into(), &4)));
+        assert_eq!(iter.next(), Some(((0, 1).into(), &2)));
         assert_eq!(iter.next(), None);
 
     }

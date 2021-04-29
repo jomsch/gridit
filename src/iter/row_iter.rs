@@ -1,4 +1,4 @@
-use super::{PositionsEnumerator, Positions};
+use crate::{PositionsEnumerator, Positions, Position};
 
 pub struct RowIter<'a, T> {
     pub(crate) row_iter: std::slice::Iter<'a, T>,
@@ -17,8 +17,8 @@ impl<'a, T: 'static> PositionsEnumerator for RowIter<'a, T> {
         Positions {
             next_pos: |inner, prev_pos| {
                 match prev_pos {
-                    None => (0, inner.idx),
-                    Some(p) => (p.0 + 1, p.1)
+                    None => (0, inner.idx).into(),
+                    Some(p) => (p.x + 1, p.y).into()
                 }
             },
             prev_position: None,
@@ -45,8 +45,8 @@ impl <'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
         Positions {
             next_pos: |inner, prev_pos| {
                 match prev_pos {
-                    None => (0, inner.idx),
-                    Some(p) => (p.0 + 1, p.1)
+                    None => (0, inner.idx).into(),
+                    Some(p) => (p.x + 1, p.y).into()
                 }
             },
             prev_position: None,
@@ -118,10 +118,10 @@ mod tests {
         };
 
         let mut row_pos = grid.row(1).positions();
-        assert_eq!(row_pos.next(), Some(((0, 1), &1)));
-        assert_eq!(row_pos.next(), Some(((1, 1), &1)));
-        assert_eq!(row_pos.next(), Some(((2, 1), &1)));
-        assert_eq!(row_pos.next(), Some(((3, 1), &1)));
+        assert_eq!(row_pos.next(), Some(((0, 1).into(), &1)));
+        assert_eq!(row_pos.next(), Some(((1, 1).into(), &1)));
+        assert_eq!(row_pos.next(), Some(((2, 1).into(), &1)));
+        assert_eq!(row_pos.next(), Some(((3, 1).into(), &1)));
         assert_eq!(row_pos.next(), None);
     }
 
@@ -183,17 +183,17 @@ mod tests {
         };
 
         let mut row_pos = grid.row_mut(1).positions();
-        assert_eq!(row_pos.next(), Some(((0, 1), &mut 1)));
-        assert_eq!(row_pos.next(), Some(((1, 1), &mut 1)));
-        assert_eq!(row_pos.next(), Some(((2, 1), &mut 1)));
-        assert_eq!(row_pos.next(), Some(((3, 1), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((0, 1).into(), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((1, 1).into(), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((2, 1).into(), &mut 1)));
+        assert_eq!(row_pos.next(), Some(((3, 1).into(), &mut 1)));
         assert_eq!(row_pos.next(), None);
 
         let mut row_pos = grid.row_mut(0).positions();
-        assert_eq!(row_pos.next(), Some(((0, 0), &mut 0)));
-        assert_eq!(row_pos.next(), Some(((1, 0), &mut 0)));
-        assert_eq!(row_pos.next(), Some(((2, 0), &mut 0)));
-        assert_eq!(row_pos.next(), Some(((3, 0), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((0, 0).into(), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((1, 0).into(), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((2, 0).into(), &mut 0)));
+        assert_eq!(row_pos.next(), Some(((3, 0).into(), &mut 0)));
         assert_eq!(row_pos.next(), None);
     }
 }

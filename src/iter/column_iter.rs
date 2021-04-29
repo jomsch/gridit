@@ -14,7 +14,7 @@ impl<'a, T> Iterator for ColumnIter<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.row_idx += 1;
-        self.grid.get(self.col_idx, self.row_idx - 1)
+        self.grid.get((self.col_idx, self.row_idx - 1))
     }
 }
 
@@ -23,7 +23,7 @@ impl<'a, T: 'static> PositionsEnumerator for ColumnIter<'a, T> {
         Positions {
             inner: self,
             prev_position: None,
-            next_pos: |inner, _| (inner.col_idx, inner.row_idx),
+            next_pos: |inner, _| (inner.col_idx, inner.row_idx).into(),
         }
     }
 }
@@ -49,8 +49,8 @@ impl<'a, T: 'static> PositionsEnumerator for ColumnIterMut<'a, T> {
             prev_position: None,
             next_pos: |inner, prev_pos| {
                 match prev_pos {
-                    None => (inner.col_idx, 0),
-                    Some(p) => (p.0, p.1 + 1),
+                    None => (inner.col_idx, 0).into(),
+                    Some(p) => (p.x, p.y + 1).into(),
                 }
             },
         }
@@ -89,13 +89,13 @@ mod tests {
         };
 
         let mut col_pos = grid.column(0).positions();
-        assert_eq!(col_pos.next(), Some(((0, 0), &0)));
-        assert_eq!(col_pos.next(), Some(((0, 1), &0)));
+        assert_eq!(col_pos.next(), Some(((0, 0).into(), &0)));
+        assert_eq!(col_pos.next(), Some(((0, 1).into(), &0)));
         assert_eq!(col_pos.next(), None);
 
         let mut col_pos = grid.column(1).positions();
-        assert_eq!(col_pos.next(), Some(((1, 0), &1)));
-        assert_eq!(col_pos.next(), Some(((1, 1), &1)));
+        assert_eq!(col_pos.next(), Some(((1, 0).into(), &1)));
+        assert_eq!(col_pos.next(), Some(((1, 1).into(), &1)));
         assert_eq!(col_pos.next(), None);
     }
 
@@ -127,13 +127,13 @@ mod tests {
         };
 
         let mut col_pos = grid.column_mut(0).positions();
-        assert_eq!(col_pos.next(), Some(((0, 0), &mut 0)));
-        assert_eq!(col_pos.next(), Some(((0, 1), &mut 0)));
+        assert_eq!(col_pos.next(), Some(((0, 0).into(), &mut 0)));
+        assert_eq!(col_pos.next(), Some(((0, 1).into(), &mut 0)));
         assert_eq!(col_pos.next(), None);
 
         let mut col_pos = grid.column_mut(1).positions();
-        assert_eq!(col_pos.next(), Some(((1, 0), &mut 1)));
-        assert_eq!(col_pos.next(), Some(((1, 1), &mut 1)));
+        assert_eq!(col_pos.next(), Some(((1, 0).into(), &mut 1)));
+        assert_eq!(col_pos.next(), Some(((1, 1).into(), &mut 1)));
         assert_eq!(col_pos.next(), None);
     }
 }

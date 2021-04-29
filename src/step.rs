@@ -61,10 +61,10 @@ impl Step {
         self
     }
 
-    pub(crate) fn take_step_from_position(&self, (px, py): Position) -> Option<Position> {
-        let x = self.x.checked_add_sub(px)?;
-        let y = self.y.checked_add_sub(py)?;
-        Some((x, y))
+    pub(crate) fn take_step_from_position(&self, pos: Position) -> Option<Position> {
+        let x = self.x.checked_add_sub(pos.x)?;
+        let y = self.y.checked_add_sub(pos.y)?;
+        Some((x, y).into())
     }
 }
 

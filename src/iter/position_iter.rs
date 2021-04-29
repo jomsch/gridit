@@ -15,7 +15,7 @@ impl Iterator for PositionsIter {
         let x = self.idx % self.width;
         let y = self.idx / self.width;
         self.idx += 1;
-        Some((x, y))
+        Some((x, y).into())
     }
 }
 
@@ -32,12 +32,12 @@ mod tests {
         };
 
         let mut positions = grid.positions();
-        assert_eq!(positions.next(), Some((0, 0)));
-        assert_eq!(positions.next(), Some((1, 0)));
-        assert_eq!(positions.next(), Some((2, 0)));
-        assert_eq!(positions.next(), Some((0, 1)));
-        assert_eq!(positions.next(), Some((1, 1)));
-        assert_eq!(positions.next(), Some((2, 1)));
+        assert_eq!(positions.next(), Some((0, 0).into()));
+        assert_eq!(positions.next(), Some((1, 0).into()));
+        assert_eq!(positions.next(), Some((2, 0).into()));
+        assert_eq!(positions.next(), Some((0, 1).into()));
+        assert_eq!(positions.next(), Some((1, 1).into()));
+        assert_eq!(positions.next(), Some((2, 1).into()));
         assert_eq!(positions.next(), None);
     }
 }

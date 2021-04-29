@@ -19,14 +19,14 @@ impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
             prev_position: None,
             next_pos: |inner, prev_pos| {
                 let (px, py) = match prev_pos {
-                    Some(xy) => xy,
-                    None => return (0, 0),
+                    Some(xy) => xy.into(),
+                    None => return (0, 0).into(),
                 };
                 let (x, y) = match px == (inner.width - 1) {
                     true => (0, py + 1),   // go one row down and reset x to 0
                     false => (px + 1, py), // keep moving x forward
                 };
-                (x, y)
+                (x, y).into()
             },
         }
     }
@@ -51,14 +51,14 @@ impl<'a, T: 'static> PositionsEnumerator for GridIterMut<'a, T> {
             prev_position: None,
             next_pos: |inner, prev_pos| {
                 let (px, py) = match prev_pos {
-                    Some(xy) => xy,
-                    None => return (0, 0),
+                    Some(xy) => xy.into(),
+                    None => return (0, 0).into(),
                 };
                 let (x, y) = match px == (inner.width - 1) {
                     true => (0, py + 1),   // go one row down and reset x to 0
                     false => (px + 1, py), // keep moving x forward
                 };
-                (x, y)
+                (x, y).into()
             },
         }
     }
@@ -88,10 +88,10 @@ mod tests {
         let grid = Grid::new(2, 2, 9usize);
         let mut iter = grid.iter().positions();
 
-        assert_eq!(iter.next(), Some(((0, 0), &9)));
-        assert_eq!(iter.next(), Some(((1, 0), &9)));
-        assert_eq!(iter.next(), Some(((0, 1), &9)));
-        assert_eq!(iter.next(), Some(((1, 1), &9)));
+        assert_eq!(iter.next(), Some(((0, 0).into(), &9)));
+        assert_eq!(iter.next(), Some(((1, 0).into(), &9)));
+        assert_eq!(iter.next(), Some(((0, 1).into(), &9)));
+        assert_eq!(iter.next(), Some(((1, 1).into(), &9)));
         assert_eq!(iter.next(), None);
     }
 
@@ -115,10 +115,10 @@ mod tests {
         let mut grid = Grid::new(2, 2, 9usize);
         let mut iter = grid.iter_mut().positions();
 
-        assert_eq!(iter.next(), Some(((0, 0), &mut 9)));
-        assert_eq!(iter.next(), Some(((1, 0), &mut 9)));
-        assert_eq!(iter.next(), Some(((0, 1), &mut 9)));
-        assert_eq!(iter.next(), Some(((1, 1), &mut 9)));
+        assert_eq!(iter.next(), Some(((0, 0).into(), &mut 9)));
+        assert_eq!(iter.next(), Some(((1, 0).into(), &mut 9)));
+        assert_eq!(iter.next(), Some(((0, 1).into(), &mut 9)));
+        assert_eq!(iter.next(), Some(((1, 1).into(), &mut 9)));
         assert_eq!(iter.next(), None);
     }
 }

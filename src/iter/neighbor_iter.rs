@@ -14,9 +14,9 @@ impl<'a, T> Iterator for NeighborIter<'a, T> {
         if self.idx >= self.positions.len() {
             return None
         }
-        let (x, y) = self.positions[self.idx];
+        let pos = self.positions[self.idx];
         self.idx += 1;
-        let cell = self.grid.get_unchecked(x, y);
+        let cell = self.grid.get_unchecked(pos);
         Some(cell)
     }
 }
@@ -31,7 +31,7 @@ impl<'a, T> PositionsEnumerator for NeighborIter<'a, T> {
                 } else {
                     // This only happens when inner.next() returns None
                     // But we need to check since idx can be out of bounds.
-                    return (0, 0);
+                    return (0, 0).into();
                 }
             },
             prev_position: None,
@@ -67,7 +67,7 @@ mod tests {
         };
 
         // middle
-        let mut neighbors = grid.neighbors(1, 1);
+        let mut neighbors = grid.neighbors((1, 1));
         assert_eq!(neighbors.next(), Some(&0));
         assert_eq!(neighbors.next(), Some(&1));
         assert_eq!(neighbors.next(), Some(&2));
@@ -78,19 +78,19 @@ mod tests {
         assert_eq!(neighbors.next(), Some(&8));
 
         // top left corner
-        let mut neighbors = grid.neighbors(0, 0);
+        let mut neighbors = grid.neighbors((0, 0));
         assert_eq!(neighbors.next(), Some(&1));
         assert_eq!(neighbors.next(), Some(&3));
         assert_eq!(neighbors.next(), Some(&4));
 
         // bottom right corner
-        let mut neighbors = grid.neighbors(2, 2);
+        let mut neighbors = grid.neighbors((2, 2));
         assert_eq!(neighbors.next(), Some(&4));
         assert_eq!(neighbors.next(), Some(&5));
         assert_eq!(neighbors.next(), Some(&7));
 
         // bottom mid
-        let mut neighbors = grid.neighbors(1, 2);
+        let mut neighbors = grid.neighbors((1, 2));
         assert_eq!(neighbors.next(), Some(&3));
         assert_eq!(neighbors.next(), Some(&4));
         assert_eq!(neighbors.next(), Some(&5));
@@ -106,15 +106,15 @@ mod tests {
             cells: (0..9).collect(),
         };
 
-        let mut neighbor_pos = grid.neighbors(1, 1).positions();
-        assert_eq!(neighbor_pos.next(), Some(((0, 0), &0)));
-        assert_eq!(neighbor_pos.next(), Some(((1, 0), &1)));
-        assert_eq!(neighbor_pos.next(), Some(((2, 0), &2)));
-        assert_eq!(neighbor_pos.next(), Some(((0, 1), &3)));
-        assert_eq!(neighbor_pos.next(), Some(((2, 1), &5)));
-        assert_eq!(neighbor_pos.next(), Some(((0, 2), &6)));
-        assert_eq!(neighbor_pos.next(), Some(((1, 2), &7)));
-        assert_eq!(neighbor_pos.next(), Some(((2, 2), &8)));
+        let mut neighbor_pos = grid.neighbors((1, 1)).positions();
+        assert_eq!(neighbor_pos.next(), Some(((0, 0).into(), &0)));
+        assert_eq!(neighbor_pos.next(), Some(((1, 0).into(), &1)));
+        assert_eq!(neighbor_pos.next(), Some(((2, 0).into(), &2)));
+        assert_eq!(neighbor_pos.next(), Some(((0, 1).into(), &3)));
+        assert_eq!(neighbor_pos.next(), Some(((2, 1).into(), &5)));
+        assert_eq!(neighbor_pos.next(), Some(((0, 2).into(), &6)));
+        assert_eq!(neighbor_pos.next(), Some(((1, 2).into(), &7)));
+        assert_eq!(neighbor_pos.next(), Some(((2, 2).into(), &8)));
         assert_eq!(neighbor_pos.next(), None);
     }
 
@@ -126,10 +126,10 @@ mod tests {
             cells: (0..4).collect(),
         };
 
-        let mut neighbor_pos = grid.neighbors(1, 1).positions();
-        assert_eq!(neighbor_pos.next(), Some(((0, 0), &0)));
-        assert_eq!(neighbor_pos.next(), Some(((1, 0), &1)));
-        assert_eq!(neighbor_pos.next(), Some(((0, 1), &2)));
+        let mut neighbor_pos = grid.neighbors((1, 1)).positions();
+        assert_eq!(neighbor_pos.next(), Some(((0, 0).into(), &0)));
+        assert_eq!(neighbor_pos.next(), Some(((1, 0).into(), &1)));
+        assert_eq!(neighbor_pos.next(), Some(((0, 1).into(), &2)));
         assert_eq!(neighbor_pos.next(), None);
     }
 }

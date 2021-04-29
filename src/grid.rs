@@ -3,7 +3,31 @@ use super::pattern::Pattern;
 use super::step::N;
 use std::mem;
 
-pub type Position = (usize, usize);
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
+pub struct Position {
+    pub x: usize,
+    pub y: usize,
+}
+
+impl Position {
+    fn new(x: usize, y: usize) -> Self {
+        Self {x, y}
+    }
+}
+
+impl From<(usize, usize)> for Position {
+    fn from((x, y): (usize, usize)) -> Self {
+        Self {x, y}
+    }
+}
+
+impl From<Position> for (usize, usize) {
+    fn from(pos: Position) -> Self {
+        (pos.x, pos.y) 
+    }
+}
+
+//pub type Position = (usize, usize);
 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
@@ -28,9 +52,10 @@ impl<T: Default> Grid<T> {
     /// Sets the element at position x,y to the default value of T  
     /// returns the old value of x,y
     /// or None if x or y is out of bounds
-    pub fn replace_default(&mut self, x: usize, y: usize) -> Option<T> {
-        if self.is_bounds(x, y) {
-            let idx = self.translate(x, y);
+    pub fn replace_default<P: Into<Position>>(&mut self, pos: P) -> Option<T> {
+        let pos = pos.into();
+        if self.is_bounds(pos) {
+            let idx = self.translate(pos);
             let old = mem::replace(&mut self.cells[idx], T::default());
             return Some(old);
         }
@@ -40,13 +65,15 @@ impl<T: Default> Grid<T> {
 
 impl<T> Grid<T> {
     #[inline]
-    fn translate(&self, x: usize, y: usize) -> usize {
-        y * self.width + x
+    fn translate<P: Into<Position>>(&self, pos: P) -> usize {
+        let pos = pos.into();
+        pos.y * self.width + pos.x
     }
 
     #[inline]
-    fn is_bounds(&self, x: usize, y: usize) -> bool {
-        x < self.width && y < self.height
+    fn is_bounds<P: Into<Position>>(&self, pos: P) -> bool {
+        let pos = pos.into();
+        pos.x < self.width && pos.y < self.height
     }
 
     /// Returns with and height of the grid
@@ -60,9 +87,10 @@ impl<T> Grid<T> {
 
     /// Returns a reference to an element at position x,y
     /// or None, if x or y are out of bounds.
-    pub fn get(&self, x: usize, y: usize) -> Option<&T> {
-        if self.is_bounds(x, y) {
-            let idx = self.translate(x, y);
+    pub fn get<P: Into<Position>>(&self, pos: P) -> Option<&T> {
+        let pos = pos.into();
+        if self.is_bounds(pos) {
+            let idx = self.translate(pos);
             return Some(&self.cells[idx]);
         }
         None
@@ -70,9 +98,10 @@ impl<T> Grid<T> {
 
     /// Returns a mutable reference to an element at position x,y
     /// or None, if x or y are out of bounds.
-    pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut T> {
-        if self.is_bounds(x, y) {
-            let idx = self.translate(x, y);
+    pub fn get_mut<P: Into<Position>>(&mut self, pos: P) -> Option<&mut T> {
+        let pos = pos.into();
+        if self.is_bounds(pos) {
+            let idx = self.translate(pos);
             return Some(&mut self.cells[idx]);
         }
         None
@@ -86,8 +115,8 @@ impl<T> Grid<T> {
     /// # Panics
     ///
     /// Panics if x*y > grid.len().
-    pub fn get_unchecked(&self, x: usize, y: usize) -> &T {
-        let idx = self.translate(x, y);
+    pub fn get_unchecked<P: Into<Position>>(&self, pos: P) -> &T {
+        let idx = self.translate(pos);
         &self.cells[idx]
     }
 
@@ -99,17 +128,18 @@ impl<T> Grid<T> {
     /// # Panics
     ///
     /// Panics if x*y > grid.len().
-    pub fn get_mut_unchecked(&mut self, x: usize, y: usize) -> &mut T {
-        let idx = self.translate(x, y);
+    pub fn get_mut_unchecked<P: Into<Position>>(&mut self, pos: P) -> &mut T {
+        let idx = self.translate(pos);
         &mut self.cells[idx]
     }
 
     /// Sets the element at position x, y to `value`.  
     /// Returns None if x or y is out of bounds,
     /// or () otherwise
-    pub fn set(&mut self, x: usize, y: usize, value: T) -> Option<()> {
-        if self.is_bounds(x, y) {
-            let idx = self.translate(x, y);
+    pub fn set<P: Into<Position>>(&mut self, pos: P, value: T) -> Option<()> {
+        let pos = pos.into();
+        if self.is_bounds(pos) {
+            let idx = self.translate(pos);
             self.cells[idx] = value;
         }
         None
@@ -123,17 +153,18 @@ impl<T> Grid<T> {
     /// # Panics
     ///
     /// Panics if x*y > grid.len().
-    pub fn set_unchecked(&mut self, x: usize, y: usize, value: T) {
-        let idx = self.translate(x, y);
+    pub fn set_unchecked<P: Into<Position>>(&mut self, pos: P, value: T) {
+        let idx = self.translate(pos);
         self.cells[idx] = value;
     }
 
     /// Sets the element at position x,y to `value`  
     /// returns the old value of x,y
     /// or None if x or y is out of bounds
-    pub fn replace(&mut self, x: usize, y: usize, value: T) -> Option<T> {
-        if self.is_bounds(x, y) {
-            let idx = self.translate(x, y);
+    pub fn replace<P: Into<Position>>(&mut self, pos: P, value: T) -> Option<T> {
+        let pos = pos.into();
+        if self.is_bounds(pos) {
+            let idx = self.translate(pos);
             let old = mem::replace(&mut self.cells[idx], value);
             return Some(old);
         }
@@ -172,7 +203,7 @@ impl<T> Grid<T> {
     ///
     /// Panics if the row is out of bounds.
     pub fn row<'a>(&'a self, y: usize) -> RowIter<'a, T> {
-        assert!(self.is_bounds(0, y));
+        assert!(self.is_bounds((0, y)));
         let start_idx = y * self.width;
         let end_idx = start_idx + self.width;
 
@@ -188,7 +219,7 @@ impl<T> Grid<T> {
     ///
     /// Panics if the row is out of bounds.
     pub fn row_mut<'a>(&'a mut self, y: usize) -> RowIterMut<'a, T> {
-        assert!(self.is_bounds(0, y));
+        assert!(self.is_bounds((0, y)));
         let start_idx = y * self.width;
         let end_idx = start_idx + self.width;
 
@@ -204,7 +235,7 @@ impl<T> Grid<T> {
     ///
     /// Panics if the column is out of bounds.
     pub fn column<'a>(&'a self, x: usize) -> ColumnIter<'a, T> {
-        assert!(self.is_bounds(x, 0));
+        assert!(self.is_bounds((x, 0)));
         ColumnIter {
             row_idx: 0,
             col_idx: x,
@@ -218,14 +249,15 @@ impl<T> Grid<T> {
     ///
     /// Panics if the column is out of bounds.
     pub fn column_mut<'a>(&'a mut self, x: usize) -> ColumnIterMut<'a, T> {
-        assert!(self.is_bounds(x, 0));
+        assert!(self.is_bounds((x, 0)));
         let width = self.width;
         let iter = self.iter_mut().skip(x).step_by(width);
         ColumnIterMut { iter, col_idx: x }
     }
 
     // Returns every valid neighbor position of x,y
-    fn get_neighbor_positions(&self, x: usize, y: usize) -> Vec<Position> {
+    fn get_neighbor_positions<P: Into<Position>>(&self, pos: P) -> Vec<Position> {
+        let Position {x, y } = pos.into();
         let neighbor_position: [(N, N); 8] = [
             (N::N(1), N::N(1)),
             (N::P(0), N::N(1)),
@@ -243,8 +275,8 @@ impl<T> Grid<T> {
                 let x = nx.checked_add_sub(x)?;
                 let y = ny.checked_add_sub(y)?;
 
-                if self.get(x, y).is_some() {
-                    return Some((x, y));
+                if self.get((x, y)).is_some() {
+                    return Some((x, y).into());
                 }
                 None
             })
@@ -258,10 +290,11 @@ impl<T> Grid<T> {
     /// # Panics
     ///
     /// Panics if x or y is out of bounds.
-    pub fn neighbors<'a>(&'a self, x: usize, y: usize) -> NeighborIter<'a, T> {
-        assert!(self.is_bounds(x, y));
+    pub fn neighbors<'a, P: Into<Position>>(&'a self, pos: P) -> NeighborIter<'a, T> {
+        let pos = pos.into();
+        assert!(self.is_bounds(pos));
         NeighborIter {
-            positions: self.get_neighbor_positions(x, y),
+            positions: self.get_neighbor_positions(pos),
             grid: &self,
             idx: 0,
         }
@@ -274,11 +307,16 @@ impl<T> Grid<T> {
     //     }
     // }
 
-    pub fn pattern<'a, P: Pattern + 'static>(&'a self, x: usize, y: usize, p: P) -> PatternIter<'a, T> {
+    pub fn pattern<'a, P, Pat>(&'a self, pos: P, pattern: Pat) -> PatternIter<'a, T> 
+    where
+        P: Into<Position>,
+        Pat: Pattern + 'static,
+    {
+        let pos = pos.into();
         PatternIter {
             grid: &self,
-            prev_position: (x, y),
-            pattern: Box::new(p),
+            prev_position: pos,
+            pattern: Box::new(pattern),
             repeat_count: 0,
         }
     }
@@ -320,7 +358,7 @@ mod tests {
             height: 3,
             cells: vec![1, 1, 1, 1, 2, 1, 1, 1, 1],
         };
-        let cell = grid.get(1, 1);
+        let cell = grid.get((1, 1));
         assert_eq!(cell, Some(&2));
     }
 
@@ -331,7 +369,7 @@ mod tests {
             height: 3,
             cells: vec![1, 1, 1, 1, 2, 1, 1, 1, 1],
         };
-        let mut_cell = grid.get_mut(1, 1);
+        let mut_cell = grid.get_mut((1, 1));
         assert_eq!(mut_cell, Some(&mut 2));
     }
 
@@ -342,7 +380,7 @@ mod tests {
             height: 3,
             cells: vec![1, 1, 1, 1, 2, 1, 1, 1, 1],
         };
-        let cell = grid.get_unchecked(1, 1);
+        let cell = grid.get_unchecked((1, 1));
         assert_eq!(cell, &2);
     }
 
@@ -354,22 +392,22 @@ mod tests {
             height: 3,
             cells: vec![1, 1, 1, 1, 2, 1, 1, 1, 1],
         };
-        let _cell = grid.get_unchecked(3, 2);
+        let _cell = grid.get_unchecked((3, 2));
     }
 
     #[test]
     fn set_cell_in_grid() {
         let mut grid = Grid::new(3, 5, 1u8);
-        grid.set(2, 2, 2u8);
-        let cell = grid.get(2, 2);
+        grid.set((2, 2), 2u8);
+        let cell = grid.get((2, 2));
         assert_eq!(cell, Some(&2));
     }
 
     #[test]
     fn set_unchecked_cell_in_grid() {
         let mut grid = Grid::new(3, 5, 1u8);
-        grid.set_unchecked(2, 2, 2u8);
-        let cell = grid.get(2, 2);
+        grid.set_unchecked((2, 2), 2u8);
+        let cell = grid.get((2, 2));
         assert_eq!(cell, Some(&2));
     }
 
@@ -377,13 +415,13 @@ mod tests {
     #[should_panic]
     fn set_unchecked_panic_cell_in_grid() {
         let mut grid = Grid::new(3, 3, 1u8);
-        grid.set_unchecked(2, 3, 2u8);
+        grid.set_unchecked((2, 3), 2u8);
     }
 
     #[test]
     fn replace_cell_in_grid() {
         let mut grid = Grid::new(2, 2, 1u8);
-        let value = grid.replace(1, 1, 2u8);
+        let value = grid.replace((1, 1), 2u8);
         assert_eq!(value, Some(1));
         assert_eq!(grid.cells, vec![1, 1, 1, 2]);
     }
