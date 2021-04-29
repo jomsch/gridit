@@ -171,6 +171,18 @@ impl<T> Grid<T> {
         None
     }
 
+    pub fn swap<P: Into<Position>>(&mut self, pos_a: P, pos_b: P) {
+        let pos_a = pos_a.into();
+        let pos_b = pos_b.into();
+        if self.is_bounds(pos_a) && self.is_bounds(pos_b) {
+            let idx_a = self.translate(pos_a);
+            let idx_b = self.translate(pos_b);
+            self.cells.swap(idx_a, idx_b);
+            return;
+        }
+        panic!("Out of bounds");
+    }
+
     /// Creates an iterator over all 2D positions in the Grid.  
     /// Iterator yields the positions as tuple of usize e.g (usize, usize).
     pub fn positions(&self) -> PositionsIter {
@@ -424,5 +436,25 @@ mod tests {
         let value = grid.replace((1, 1), 2u8);
         assert_eq!(value, Some(1));
         assert_eq!(grid.cells, vec![1, 1, 1, 2]);
+    }
+
+    #[test]
+    fn grid_replace_default() {
+        let mut grid = Grid::new(2, 2, 1u8);
+        grid.replace_default((1, 1));
+        assert_eq!(grid.get((1, 1)), Some(&0));
+    }
+
+    #[test]
+    fn grid_swap() {
+        let mut grid = Grid {
+            cells: (0..6).collect(),
+            width: 2,
+            height: 3,
+        };
+
+        grid.swap((1, 2), (0, 1));
+        assert_eq!(grid.get((1, 2)), Some(&2));
+        assert_eq!(grid.get((0, 1)), Some(&5));
     }
 }
