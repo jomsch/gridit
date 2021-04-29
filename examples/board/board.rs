@@ -41,11 +41,11 @@ impl Board {
 
     pub fn on_click(&mut self, point: Point2<f32>) {
         //self.reset_board_color();
-        let cpos = self.get_grid_position(point);
-        let mut piece = self.grid.get_mut_unchecked(cpos.0, cpos.1);
+        let clicked_pos= self.get_grid_position(point);
+        let mut piece = self.grid.get_mut_unchecked(clicked_pos);
         match (&piece, self.selected_field) {
             (Some(piece), None) => {
-                self.selected_field = Some(cpos);
+                self.selected_field = Some(clicked_pos);
             },
             // (None, Some(pos)) => {
             // }
@@ -65,7 +65,7 @@ impl Board {
         let point = Point2::from([point.x - bp.x, point.y - bp.y]);
         let px = (point.x / field_size) as usize;
         let py = (point.y / field_size) as usize;
-        (px, py)
+        (px, py).into()
     }
 
     fn select_field(&mut self) {
@@ -81,7 +81,8 @@ impl Drawable for Board {
         let (bx, by) = (self.rect.x, self.rect.y);
         let rect_size = self.rect.w / 8.0;
 
-        for ((x, y), piece) in self.grid.iter().positions() {
+        for (position, piece) in self.grid.iter().positions() {
+            let (x, y) = position.into();
             let bg_color = match (x + y) % 2 == 0 {
                 true => WHITE,
                 false => BLACK,
@@ -97,7 +98,7 @@ impl Drawable for Board {
                 bg_color,
             )?;
             graphics::draw(ctx, &mrect, DrawParam::default())?;
-            if self.selected_field == Some((x, y)) {
+            if self.selected_field == Some(position) {
                 let mrect = Mesh::new_rectangle(
                     ctx,
                     DrawMode::Fill(FillOptions::default()),

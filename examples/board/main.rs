@@ -46,7 +46,7 @@ impl BoardGame {
 
 
         let img = graphics::Image::new(ctx, "/black_pawn.png").unwrap();
-        grid.set_unchecked(4, 4, Some(Box::new(Pawn::new(img))));
+        grid.set_unchecked((4, 4), Some(Box::new(Pawn::new(img))));
 
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
 
