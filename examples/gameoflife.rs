@@ -55,9 +55,9 @@ fn main() -> crossterm::Result<()> {
     let (mid_x, mid_y) = ((row_size - 1) / 2, (col_size - 1) / 2);
 
     let mut grid: Grid<PodCell> = Grid::new(row_size, col_size, PodCell::new(Cell::Dead));
-    grid.set_unchecked(mid_x, mid_y - 1, PodCell::new(Cell::Alive));
-    grid.set_unchecked(mid_x, mid_y, PodCell::new(Cell::Alive));
-    grid.set_unchecked(mid_x, mid_y + 1, PodCell::new(Cell::Alive));
+    grid.set_unchecked((mid_x, mid_y - 1), PodCell::new(Cell::Alive));
+    grid.set_unchecked((mid_x, mid_y), PodCell::new(Cell::Alive));
+    grid.set_unchecked((mid_x, mid_y + 1), PodCell::new(Cell::Alive));
 
     loop {
         if poll(Duration::from_millis(500))? {
@@ -71,13 +71,13 @@ fn main() -> crossterm::Result<()> {
             }
         }
 
-        for (x, y) in grid.positions() {
+        for position in grid.positions() {
             let neighbor_count = grid
-                .neighbors(x, y)
+                .neighbors(position)
                 .filter(|c| c.current == Cell::Alive)
                 .count();
-            let current = grid.get_unchecked(x, y).current.clone();
-            let mut cell = grid.get_mut_unchecked(x, y);
+            let current = grid.get_unchecked(position).current.clone();
+            let mut cell = grid.get_mut_unchecked(position);
 
             match (&current, neighbor_count) {
                 (Cell::Alive, 1) => cell.future = Cell::Dead,
