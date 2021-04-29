@@ -61,6 +61,18 @@ impl<T: Default> Grid<T> {
         }
         None
     }
+
+    pub fn move_to<P: Into<Position>>(&mut self, pos: P, to: P) {
+        let pos = pos.into(); 
+        let to = to.into();
+
+        if !self.is_bounds(pos) && !self.is_bounds(to) {
+            panic!("Out of bounds");
+        }
+
+        let idx_to = self.translate(to);
+        self.cells[idx_to] = self.replace_default(pos).unwrap();
+    }
 }
 
 impl<T> Grid<T> {
@@ -174,13 +186,24 @@ impl<T> Grid<T> {
     pub fn swap<P: Into<Position>>(&mut self, pos_a: P, pos_b: P) {
         let pos_a = pos_a.into();
         let pos_b = pos_b.into();
-        if self.is_bounds(pos_a) && self.is_bounds(pos_b) {
-            let idx_a = self.translate(pos_a);
-            let idx_b = self.translate(pos_b);
-            self.cells.swap(idx_a, idx_b);
-            return;
+        if !self.is_bounds(pos_a) && !self.is_bounds(pos_b) {
+            panic!("Out of bounds");
         }
-        panic!("Out of bounds");
+
+        let idx_a = self.translate(pos_a);
+        let idx_b = self.translate(pos_b);
+        self.cells.swap(idx_a, idx_b);
+    }
+
+    pub fn move_and_leave<P: Into<Position>>(&mut self, pos: P, to: P, value: T) {
+        let pos = pos.into();
+        let to = to.into();
+        if !self.is_bounds(pos) && !self.is_bounds(to) {
+            panic!("Out of bound");
+        }
+
+        let idx_to = self.translate(to);
+        self.cells[idx_to] = self.replace(pos, value).unwrap();
     }
 
     /// Creates an iterator over all 2D positions in the Grid.  
@@ -225,7 +248,7 @@ impl<T> Grid<T> {
         }
     }
 
-    /// Creates an mutable iterator over a specific row in the grid.
+    /// CVectorreates an mutable iterator over a specific row in the grid.
     ///
     /// # Panics
     ///
@@ -439,14 +462,14 @@ mod tests {
     }
 
     #[test]
-    fn grid_replace_default() {
+    fn replace_default() {
         let mut grid = Grid::new(2, 2, 1u8);
         grid.replace_default((1, 1));
         assert_eq!(grid.get((1, 1)), Some(&0));
     }
 
     #[test]
-    fn grid_swap() {
+    fn swap() {
         let mut grid = Grid {
             cells: (0..6).collect(),
             width: 2,
@@ -456,5 +479,31 @@ mod tests {
         grid.swap((1, 2), (0, 1));
         assert_eq!(grid.get((1, 2)), Some(&2));
         assert_eq!(grid.get((0, 1)), Some(&5));
+    }
+
+    #[test]
+    fn move_to() {
+        let mut grid = Grid {
+            cells: (0..4).collect(),
+            width: 2,
+            height: 2,
+        };
+
+        grid.move_to((1, 1), (0, 1));
+        assert_eq!(grid.get((1, 1)), Some(&0));
+        assert_eq!(grid.get((0, 1)), Some(&3));
+    }
+
+    #[test]
+    fn move_and_leave() {
+        let mut grid = Grid {
+            cells: (0..4).collect(),
+            width: 2,
+            height: 2,
+        };
+
+        grid.move_and_leave((1, 0), (0, 0), 10);
+        assert_eq!(grid.get((1, 0)), Some(&10));
+        assert_eq!(grid.get((0, 0)), Some(&1));
     }
 }
