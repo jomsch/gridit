@@ -73,14 +73,6 @@ impl BoardGame {
 
 impl EventHandler for BoardGame {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        let mpos = mouse::position(ctx);
-        let lbtn_pressed = mouse::button_pressed(ctx,  MouseButton::Left);
-
-        if self.board.contains_point(mpos) && lbtn_pressed {
-            self.board.on_click(mpos);
-        }
-
-    
         Ok(())
     }
 
@@ -101,5 +93,17 @@ impl EventHandler for BoardGame {
 
     fn resize_event(&mut self, _ctx: &mut Context, _width: f32, _height: f32) {
         self.has_resized = true;        
+    }
+
+    fn mouse_button_up_event(&mut self, ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
+        
+    }
+
+    fn mouse_button_down_event(&mut self, ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
+        if self.board.contains_point([x, y].into()) {
+            self.board.select_field([x, y].into());
+        } else {
+            self.board.unselect_field();
+        }
     }
 }

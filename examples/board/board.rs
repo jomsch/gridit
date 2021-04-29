@@ -11,6 +11,7 @@ use crate::piece::Piece;
 pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
 pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
 pub const SELECT: Color = Color::new(186./255., 202./255., 68./255., 0.9);
+pub const RED: Color = Color::new(186./255., 68./255., 68./255., 1.0);
 
 
 pub type BoardPiece = Option<Box<dyn Piece>>;
@@ -39,25 +40,6 @@ impl Board {
         self.rect = rect;
     }
 
-    pub fn on_click(&mut self, point: Point2<f32>) {
-        //self.reset_board_color();
-        let clicked_pos= self.get_grid_position(point);
-        let mut piece = self.grid.get_mut_unchecked(clicked_pos);
-        match (&piece, self.selected_field) {
-            (Some(piece), None) => {
-                self.selected_field = Some(clicked_pos);
-            },
-            // (None, Some(pos)) => {
-            // }
-            (_, _) => (),
-        }
-    }
-
-    // fn reset_board_color(&mut self) {
-    //     self.grid.iter_mut()
-    //         .for_each(|f| f.deactivate());
-    // }
-
     fn get_grid_position(&self, point: Point2<f32>) -> gridit::Position {
         let rect = self.rect;
         let bp = rect.point();
@@ -68,12 +50,31 @@ impl Board {
         (px, py).into()
     }
 
-    fn select_field(&mut self) {
+    pub fn select_field(&mut self, point: Point2<f32>) {
+        let clicked_pos = self.get_grid_position(point);
+        let mut piece = self.grid.get_mut_unchecked(clicked_pos);
+        match (&piece, self.selected_field) {
+            (Some(piece), None) => {
+                self.selected_field = Some(clicked_pos);
+            },
+            (None, Some(pos)) => {
+                let selected_piece = self.grid.get_unchecked(pos);
+                if let Some(piece) = selected_piece {
+                    let pmoves =  piece.possible_moves(&self.grid, pos);
+                    if pmoves.contains(&clicked_pos) {
+                        self.grid.move_to(pos, clicked_pos);
+                    }
+                    self.selected_field = None;
+                }
+            }
+            (_, _) => (),
+        }
     }
 
     pub fn unselect_field(&mut self) {
         self.selected_field = None;
     }
+
 }
 
 impl Drawable for Board {
@@ -98,6 +99,7 @@ impl Drawable for Board {
                 bg_color,
             )?;
             graphics::draw(ctx, &mrect, DrawParam::default())?;
+
             if self.selected_field == Some(position) {
                 let mrect = Mesh::new_rectangle(
                     ctx,
@@ -117,6 +119,35 @@ impl Drawable for Board {
                 img.draw(ctx, DrawParam::new().dest(dest))?;
             }
         }
+
+        if let Some(select_position) = self.selected_field {
+            let field = self.grid.get_unchecked(select_position);
+            if let Some(piece) = field {
+                let moves = piece.possible_moves(&self.grid, select_position);
+                for mv in moves {
+                    let (x, y) = mv.into();
+                    let (fx, fy) = (x as f32, y as f32);
+                    let cx = fx * rect_size + bx;
+                    let cy = fy * rect_size + by;
+                    let radius: f32 = 30.;
+                    let hs = rect_size/2.;
+                    let hr = radius/2.;
+                    let point: Point2<f32> = [cx + hs, cy + hs].into();
+
+                    let cmesh = Mesh::new_circle(
+                        ctx, 
+                        DrawMode::Fill(FillOptions::default()),
+                        point,
+                        radius,
+                        1.,
+                        RED,
+                    )?;
+                    cmesh.draw(ctx, DrawParam::default())?;
+                }
+            }
+        }
+
+
         let mrect = Mesh::new_rectangle(
             ctx,
             DrawMode::Stroke(StrokeOptions::default()),
