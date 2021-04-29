@@ -11,8 +11,10 @@ use gridit::GridBuilder;
 
 mod board;
 mod piece;
+mod picker;
 use crate::board::*;
 use crate::piece::*;
+use crate::picker::*;
 
 
 fn main() {
@@ -31,6 +33,7 @@ fn main() {
 
 struct BoardGame {
     board: Board,
+    picker: Picker,
     has_resized: bool,
     hdpi_factor: f32,
 }
@@ -52,6 +55,7 @@ impl BoardGame {
 
         Self { 
             board: Board::new(grid, (50.0, 50.0), 400.0),
+            picker: Picker::new(Rect::new(550., 50., 200., 700.)),
             has_resized: true,
             hdpi_factor,
         }
@@ -63,11 +67,24 @@ impl BoardGame {
         let size = if x >= y {
             y
         } else {
-            x
+            x * 0.8
         };
         let padding = 50.0;
         let draw_rect = Rect::new(padding, padding, size*hdpi_factor-(padding*2.), size*hdpi_factor-(padding*2.));
         self.board.set_rect(draw_rect);
+    }
+
+    fn resize_picker(&mut self, ctx: &Context) {
+        let hdpi_factor = graphics::window(ctx).scale_factor() as f32;
+        let (x, y) = graphics::size(ctx);
+        let height = y;
+        let width = x * 0.20;
+        let padding = 50.0;
+
+        let draw_rect = Rect::new((x-width)*hdpi_factor, padding, width*hdpi_factor-(padding*2.), height*hdpi_factor-(padding*2.));
+        dbg!(draw_rect);
+        self.picker.set_rect(draw_rect);
+         
     }
 }
 
@@ -84,10 +101,12 @@ impl EventHandler for BoardGame {
             let draw_rect = Rect::new(0.0, 0.0, x*hdpi_factor, y*hdpi_factor);
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);
+            self.resize_picker(ctx);
             self.has_resized = false;
         }
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;
+        graphics::draw(ctx, &self.picker, DrawParam::default())?;
         graphics::present(ctx)
     }
 
