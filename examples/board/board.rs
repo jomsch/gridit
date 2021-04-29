@@ -4,20 +4,29 @@ use ggez::graphics::{
 };
 use ggez::mint::Point2;
 
-use gridit::Grid;
-use gridit::PositionsEnumerator;
+use gridit::{Grid, PositionsEnumerator};
 
 pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
 pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Piece;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Field {
     pub bg_color: Color,
     pub default_color: Color,
     pub piece: Option<Piece>,
+}
+
+impl Field {
+    fn activate(&mut self) {
+        self.bg_color = Color::from_rgb(186, 202, 68);
+    }
+
+    fn deactivate(&mut self) {
+        self.bg_color = self.default_color;  
+    }
 }
 
 pub struct Board {
@@ -41,6 +50,28 @@ impl Board {
 
     pub fn set_rect(&mut self, rect: Rect) {
         self.rect = rect;
+    }
+
+    pub fn on_click(&mut self, point: Point2<f32>) {
+        self.reset_board_color();
+        let cpos = self.get_grid_position(point);
+        let field = self.grid.get_mut_unchecked(cpos.0, cpos.1);
+        field.activate();
+    }
+
+    fn reset_board_color(&mut self) {
+        self.grid.iter_mut()
+            .for_each(|f| f.deactivate());
+    }
+
+    fn get_grid_position(&self, point: Point2<f32>) -> gridit::Position {
+        let rect = self.rect;
+        let bp = rect.point();
+        let field_size = rect.w/8.0;
+        let point = Point2::from([point.x - bp.x, point.y - bp.y]);
+        let px = (point.x / field_size) as usize;
+        let py = (point.y / field_size) as usize;
+        (px, py)
     }
 }
 

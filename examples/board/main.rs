@@ -75,10 +75,7 @@ impl EventHandler for BoardGame {
 
         if self.board.contains_point(mpos) && lbtn_pressed {
             println!("{}, {}, MouseButton Pressed: {}", mpos.x, mpos.y, lbtn_pressed);
-            let mut brect = self.board.get_rect();
-            brect.w += 5.0;
-            brect.h += 5.0;
-            self.board.set_rect(brect);
+            self.board.on_click(mpos);
         }
 
     
