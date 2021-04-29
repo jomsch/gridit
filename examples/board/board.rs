@@ -6,17 +6,16 @@ use ggez::mint::Point2;
 
 use gridit::{Grid, PositionsEnumerator};
 
+use crate::piece::Piece;
+
 pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
 pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Piece;
 
-#[derive(Clone, Debug, PartialEq)]
 pub struct Field {
     pub bg_color: Color,
     pub default_color: Color,
-    pub piece: Option<Piece>,
+    pub piece: Option<Box<dyn Piece>>,
 }
 
 impl Field {
@@ -92,6 +91,15 @@ impl Drawable for Board {
                 field.bg_color,
             )?;
             graphics::draw(ctx, &mrect, DrawParam::default())?;
+            if let Some(piece) = &field.piece {
+                let img = piece.image();
+                let iw = (img.width()/2) as f32; 
+                let ih = (img.height()/2) as f32; 
+                let rw = rect.w/2.0;
+                let rh = rect.h/2.0;
+                let dest = [rect.x + rw - iw, rect.y + rh - ih];
+                img.draw(ctx, DrawParam::new().dest(dest))?;
+            }
         }
         let mrect = Mesh::new_rectangle(
             ctx,

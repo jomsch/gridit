@@ -3,17 +3,25 @@ use ggez::input::mouse;
 use ggez::input::keyboard::{KeyCode, KeyMods};
 use ggez::mint::Point2;
 use ggez::graphics::DrawParam;
-use ggez::{graphics, Context, ContextBuilder, GameResult};
+use ggez::{filesystem, graphics, Context, ContextBuilder, GameResult};
 use ggez::graphics::Rect;
 use gridit::Grid;
 use gridit::PositionsEnumerator;
+use gridit::GridBuilder;
 
 mod board;
+mod piece;
 use crate::board::*;
+use crate::piece::*;
 
 
 fn main() {
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    let mut path = std::path::PathBuf::from(manifest_dir);
+    path.push("resources");
+
     let (mut ctx, event_loop) = ContextBuilder::new("pawn_example", "")
+        .add_resource_path(path)
         .build()
         .expect("Could not create context");
 
@@ -29,21 +37,27 @@ struct BoardGame {
 
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
-        let mut grid = Grid::new(
-            8,
-            8,
-            Field {
+        let mut items: Vec<Field> = (0..64).map(|_| Field {
                 default_color: BLACK,
                 bg_color: BLACK,
                 piece: None,
-            },
-        );
+            }).collect();
+        let mut grid = GridBuilder::new()
+            .from(items)
+            .width(8)
+            .height(8)
+            .build();
 
         for (_, field) in grid.iter_mut().positions().filter(|((x, y), _)| (x + y) % 2 == 0)
         {
             field.default_color = WHITE;
             field.bg_color = WHITE;
         }
+
+        let img = graphics::Image::new(ctx, "/black_pawn.png").unwrap();
+        let mut field = grid.get_mut_unchecked(4, 4);
+        field.piece = Some(Box::new(Pawn::new(img)));
+
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
 
         Self { 
@@ -63,7 +77,6 @@ impl BoardGame {
         };
         let padding = 50.0;
         let draw_rect = Rect::new(padding, padding, size*hdpi_factor-(padding*2.), size*hdpi_factor-(padding*2.));
-        // let draw_rect = Rect::new(0.0, 0.0, size*hdpi_factor, size*hdpi_factor);
         self.board.set_rect(draw_rect);
     }
 }
@@ -91,6 +104,7 @@ impl EventHandler for BoardGame {
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);
             self.has_resized = false;
+            println!("{:#?}", ctx.filesystem);
         }
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;
