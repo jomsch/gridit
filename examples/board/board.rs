@@ -4,39 +4,27 @@ use ggez::graphics::{
 };
 use ggez::mint::Point2;
 
-use gridit::{Grid, PositionsEnumerator};
+use gridit::{Grid, PositionsEnumerator, Position};
 
 use crate::piece::Piece;
 
 pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
 pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
+pub const SELECT: Color = Color::new(186./255., 202./255., 68./255., 0.9);
 
 
-pub struct Field {
-    pub bg_color: Color,
-    pub default_color: Color,
-    pub piece: Option<Box<dyn Piece>>,
-}
-
-impl Field {
-    fn activate(&mut self) {
-        self.bg_color = Color::from_rgb(186, 202, 68);
-    }
-
-    fn deactivate(&mut self) {
-        self.bg_color = self.default_color;  
-    }
-}
+pub type BoardPiece = Option<Box<dyn Piece>>;
 
 pub struct Board {
-    pub grid :Grid<Field>,
+    pub grid :Grid<BoardPiece>,
     rect: Rect,
+    selected_field: Option<Position>,
 }
 
 impl Board {
-    pub fn new(grid: Grid<Field>, xy: (f32, f32), size: f32) -> Self {
+    pub fn new(grid: Grid<BoardPiece>, xy: (f32, f32), size: f32) -> Self {
         let rect = Rect::new(xy.0, xy.1, size, size);
-        Self { grid, rect }
+        Self { grid, rect, selected_field: None }
     }
 
     pub fn contains_point(&self, point: Point2<f32>) -> bool {
@@ -52,16 +40,23 @@ impl Board {
     }
 
     pub fn on_click(&mut self, point: Point2<f32>) {
-        self.reset_board_color();
+        //self.reset_board_color();
         let cpos = self.get_grid_position(point);
-        let field = self.grid.get_mut_unchecked(cpos.0, cpos.1);
-        field.activate();
+        let mut piece = self.grid.get_mut_unchecked(cpos.0, cpos.1);
+        match (&piece, self.selected_field) {
+            (Some(piece), None) => {
+                self.selected_field = Some(cpos);
+            },
+            // (None, Some(pos)) => {
+            // }
+            (_, _) => (),
+        }
     }
 
-    fn reset_board_color(&mut self) {
-        self.grid.iter_mut()
-            .for_each(|f| f.deactivate());
-    }
+    // fn reset_board_color(&mut self) {
+    //     self.grid.iter_mut()
+    //         .for_each(|f| f.deactivate());
+    // }
 
     fn get_grid_position(&self, point: Point2<f32>) -> gridit::Position {
         let rect = self.rect;
@@ -72,6 +67,13 @@ impl Board {
         let py = (point.y / field_size) as usize;
         (px, py)
     }
+
+    fn select_field(&mut self) {
+    }
+
+    pub fn unselect_field(&mut self) {
+        self.selected_field = None;
+    }
 }
 
 impl Drawable for Board {
@@ -79,19 +81,32 @@ impl Drawable for Board {
         let (bx, by) = (self.rect.x, self.rect.y);
         let rect_size = self.rect.w / 8.0;
 
-        for ((x, y), field) in self.grid.iter().positions() {
-            let (x, y) = (x as f32, y as f32);
-            let rect_x = x * rect_size + bx;
-            let rect_y = y * rect_size + by;
+        for ((x, y), piece) in self.grid.iter().positions() {
+            let bg_color = match (x + y) % 2 == 0 {
+                true => WHITE,
+                false => BLACK,
+            };
+            let (fx, fy) = (x as f32, y as f32);
+            let rect_x = fx * rect_size + bx;
+            let rect_y = fy * rect_size + by;
             let rect = Rect::new(rect_x, rect_y, rect_size, rect_size);
             let mrect = Mesh::new_rectangle(
                 ctx,
                 DrawMode::Fill(FillOptions::default()),
                 rect,
-                field.bg_color,
+                bg_color,
             )?;
             graphics::draw(ctx, &mrect, DrawParam::default())?;
-            if let Some(piece) = &field.piece {
+            if self.selected_field == Some((x, y)) {
+                let mrect = Mesh::new_rectangle(
+                    ctx,
+                    DrawMode::Fill(FillOptions::default()),
+                    rect,
+                    SELECT,
+                )?;
+                mrect.draw(ctx, DrawParam::default())?;
+            }
+            if let Some(piece) = piece {
                 let img = piece.image();
                 let iw = (img.width()/2) as f32; 
                 let ih = (img.height()/2) as f32; 

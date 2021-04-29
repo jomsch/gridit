@@ -37,26 +37,16 @@ struct BoardGame {
 
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
-        let mut items: Vec<Field> = (0..64).map(|_| Field {
-                default_color: BLACK,
-                bg_color: BLACK,
-                piece: None,
-            }).collect();
+        let mut items: Vec<BoardPiece> = (0..64).map(|_|None).collect();
         let mut grid = GridBuilder::new()
             .from(items)
             .width(8)
             .height(8)
             .build();
 
-        for (_, field) in grid.iter_mut().positions().filter(|((x, y), _)| (x + y) % 2 == 0)
-        {
-            field.default_color = WHITE;
-            field.bg_color = WHITE;
-        }
 
         let img = graphics::Image::new(ctx, "/black_pawn.png").unwrap();
-        let mut field = grid.get_mut_unchecked(4, 4);
-        field.piece = Some(Box::new(Pawn::new(img)));
+        grid.set_unchecked(4, 4, Some(Box::new(Pawn::new(img))));
 
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
 
@@ -87,7 +77,6 @@ impl EventHandler for BoardGame {
         let lbtn_pressed = mouse::button_pressed(ctx,  MouseButton::Left);
 
         if self.board.contains_point(mpos) && lbtn_pressed {
-            println!("{}, {}, MouseButton Pressed: {}", mpos.x, mpos.y, lbtn_pressed);
             self.board.on_click(mpos);
         }
 
@@ -104,7 +93,6 @@ impl EventHandler for BoardGame {
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);
             self.has_resized = false;
-            println!("{:#?}", ctx.filesystem);
         }
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;
