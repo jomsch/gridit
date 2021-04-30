@@ -11,6 +11,7 @@ use crate::piece::Piece;
 pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
 pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
 pub const SELECT: Color = Color::new(186./255., 202./255., 68./255., 0.9);
+pub const HOVER: Color = Color::new(0.5, 0.5, 0.5, 0.7);
 pub const RED: Color = Color::new(186./255., 68./255., 68./255., 1.0);
 
 
@@ -20,12 +21,13 @@ pub struct Board {
     pub grid :Grid<BoardPiece>,
     rect: Rect,
     selected_field: Option<Position>,
+    hover_field: Option<Position>,
 }
 
 impl Board {
     pub fn new(grid: Grid<BoardPiece>, xy: (f32, f32), size: f32) -> Self {
         let rect = Rect::new(xy.0, xy.1, size, size);
-        Self { grid, rect, selected_field: None }
+        Self { grid, rect, selected_field: None, hover_field: None }
     }
 
     pub fn contains_point(&self, point: Point2<f32>) -> bool {
@@ -75,6 +77,20 @@ impl Board {
         self.selected_field = None;
     }
 
+    pub fn hover_field(&mut self, point: Point2<f32>) {
+        let clicked_pos = self.get_grid_position(point);
+        self.hover_field = Some(clicked_pos);
+    }
+
+    pub fn unhover(&mut self) {
+        self.hover_field = None;
+    }
+
+    pub fn set_field(&mut self, point: Point2<f32>, piece: Box<dyn Piece>) {
+        let clicked_pos = self.get_grid_position(point);
+        self.grid.set_unchecked(clicked_pos, Some(piece));
+    }
+
 }
 
 impl Drawable for Board {
@@ -109,6 +125,17 @@ impl Drawable for Board {
                 )?;
                 mrect.draw(ctx, DrawParam::default())?;
             }
+
+            if self.hover_field == Some(position) {
+                let mrect = Mesh::new_rectangle(
+                    ctx,
+                    DrawMode::Fill(FillOptions::default()),
+                    rect,
+                    HOVER,
+                )?;
+                mrect.draw(ctx, DrawParam::default())?;
+            }
+
             if let Some(piece) = piece {
                 let img = piece.image();
                 let iw = (img.width()/2) as f32; 

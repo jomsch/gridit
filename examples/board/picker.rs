@@ -12,14 +12,19 @@ const BACKGROUND: Color = Color::new(0.8, 0.8, 0.8 ,1.0);
 
 pub struct PickerItem {
     item: Box<dyn Piece>,
+    name: Name,
+    pcolor: PColor,
     rect: Rect,
 }
 
 impl PickerItem {
-    fn new(item: Box<dyn Piece>) -> Self {
+    fn new(ctx: &mut Context, name: Name, pcolor: PColor) -> Self {
         Self {
-            item,
+            item: new_piece(ctx, name, pcolor),
             rect: Rect::default(),
+            name,
+            pcolor,
+
         }
     }
 
@@ -65,18 +70,18 @@ pub struct Picker {
 impl Picker {
     pub fn new(ctx: &mut Context, rect: Rect) -> Self {
         let mut items = Vec::new(); 
-        items.push(PickerItem::new(new_piece(ctx, Name::PAWN, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::TEST, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::PAWN, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::TEST, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::PAWN, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::TEST, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::PAWN, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::TEST, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::PAWN, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::TEST, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::PAWN, PColor::BLACK)));
-        items.push(PickerItem::new(new_piece(ctx, Name::TEST, PColor::BLACK)));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::TEST, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::TEST, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::TEST, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::TEST, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::TEST, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::TEST, PColor::BLACK));
 
         let mut picker = Self { items, rect };
         picker.update_items_rects();
@@ -106,6 +111,25 @@ impl Picker {
 
     pub fn rect(&self) -> &Rect {
         &self.rect
+    }
+
+    pub fn contains_point(&self, point: Point2<f32>) -> bool {
+        self.rect.contains(point)
+    }
+
+    pub fn on_dragable(&self, point: Point2<f32>) -> bool {
+        self.items.iter()
+            .filter(|i| i.rect.contains(point))
+            .next()
+            .is_some()
+    }
+
+    pub fn get_item_at(&self, at: Point2<f32>) -> (Image, Name, PColor){
+        let item = self.items.iter()
+            .filter(|i| i.rect.contains(at))
+            .next()
+            .unwrap();
+        (item.item.image().clone(), item.name, item.pcolor)
     }
 }
 

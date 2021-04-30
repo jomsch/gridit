@@ -36,6 +36,7 @@ struct BoardGame {
     picker: Picker,
     has_resized: bool,
     hdpi_factor: f32,
+    draggin: Option<(graphics::Image, Name, PColor)>,
 }
 
 impl BoardGame {
@@ -57,6 +58,7 @@ impl BoardGame {
             picker: Picker::new(ctx, Rect::new(550., 50., 200., 700.)),
             has_resized: true,
             hdpi_factor,
+            draggin: None,
         }
     }
 
@@ -88,6 +90,20 @@ impl BoardGame {
 
 impl EventHandler for BoardGame {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+        let mpoint = mouse::position(ctx);
+        if self.draggin.is_some() {
+            mouse::set_cursor_type(ctx, mouse::CursorIcon::Grabbing);
+        } else if self.picker.on_dragable(mpoint) {
+            mouse::set_cursor_type(ctx, mouse::CursorIcon::Grab);
+        } else {
+            mouse::set_cursor_type(ctx, mouse::CursorIcon::Default);
+        }
+
+        if self.board.contains_point(mpoint) {
+            self.board.hover_field(mpoint);
+        } else {
+            self.board.unhover();
+        }
         Ok(())
     }
 
@@ -107,6 +123,15 @@ impl EventHandler for BoardGame {
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;
         graphics::draw(ctx, &self.picker, DrawParam::default())?;
+
+        if let Some(item) = &self.draggin {
+            let mpos = mouse::position(ctx);
+            let img = &item.0;
+            let img_center_w = (img.width()/2) as f32;
+            let img_h = (img.height()) as f32;
+            let dest: Point2<f32 >= [(mpos.x - img_center_w), (mpos.y - img_h)].into();
+            graphics::draw(ctx, img, DrawParam::default().dest(dest))?;
+        }
         graphics::present(ctx)
     }
 
@@ -115,14 +140,26 @@ impl EventHandler for BoardGame {
     }
 
     fn mouse_button_up_event(&mut self, ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
-        
+        let mpoint = [x, y].into();
+        if self.board.contains_point(mpoint) && self.draggin.is_some() {
+            let info = self.draggin.take(); 
+            let (_, name, pcolor) = info.unwrap(); 
+            self.board.set_field(mpoint, new_piece(ctx, name, pcolor));
+        }
     }
 
     fn mouse_button_down_event(&mut self, ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
-        if self.board.contains_point([x, y].into()) {
-            self.board.select_field([x, y].into());
-        } else {
-            self.board.unselect_field();
+        let mpoint = [x, y].into();
+        if self.board.contains_point(mpoint) {
+            self.board.select_field(mpoint);
+            return;
+        } 
+        if self.picker.contains_point(mpoint){
+            if self.picker.on_dragable(mpoint) {
+                let piece_info = self.picker.get_item_at(mpoint);
+                self.draggin = Some(piece_info);
+            }
         }
+        self.board.unselect_field();
     }
 }

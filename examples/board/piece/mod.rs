@@ -12,6 +12,7 @@ mod pawn;
 pub use pawn::Pawn;
 
 
+#[derive(Copy, Clone)]
 pub enum PColor {
     BLACK,
     WHITE
@@ -26,6 +27,7 @@ impl PColor {
     }
 }
 
+#[derive(Copy, Clone)]
 pub enum Name {
     PAWN,
     TEST,
