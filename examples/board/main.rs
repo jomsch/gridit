@@ -48,14 +48,13 @@ impl BoardGame {
             .build();
 
 
-        let img = graphics::Image::new(ctx, "/black_pawn.png").unwrap();
-        grid.set_unchecked((4, 4), Some(Box::new(Pawn::new(img))));
+        grid.set_unchecked((4, 4), Some(new_piece(ctx, Name::PAWN, PColor::BLACK)));
 
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
 
         Self { 
             board: Board::new(grid, (50.0, 50.0), 400.0),
-            picker: Picker::new(Rect::new(550., 50., 200., 700.)),
+            picker: Picker::new(ctx, Rect::new(550., 50., 200., 700.)),
             has_resized: true,
             hdpi_factor,
         }
@@ -82,7 +81,6 @@ impl BoardGame {
         let padding = 50.0;
 
         let draw_rect = Rect::new((x-width)*hdpi_factor, padding, width*hdpi_factor-(padding*2.), height*hdpi_factor-(padding*2.));
-        dbg!(draw_rect);
         self.picker.set_rect(draw_rect);
          
     }
@@ -97,12 +95,14 @@ impl EventHandler for BoardGame {
         graphics::clear(ctx, graphics::Color::new(0.25, 0.25, 0.25, 1.0));
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
         if self.has_resized || self.hdpi_factor != hdpi_factor {
+            self.hdpi_factor = hdpi_factor;
             let (x, y) = graphics::size(&ctx);
             let draw_rect = Rect::new(0.0, 0.0, x*hdpi_factor, y*hdpi_factor);
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);
             self.resize_picker(ctx);
             self.has_resized = false;
+            println!("test");
         }
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;
