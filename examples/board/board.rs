@@ -59,7 +59,7 @@ impl Board {
             (Some(piece), None) => {
                 self.selected_field = Some(clicked_pos);
             },
-            (None, Some(pos)) => {
+            (_, Some(pos)) => {
                 let selected_piece = self.grid.get_unchecked(pos);
                 if let Some(piece) = selected_piece {
                     let pmoves =  piece.possible_moves(&self.grid, pos);
