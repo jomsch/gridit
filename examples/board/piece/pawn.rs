@@ -30,16 +30,8 @@ impl Piece for Pawn {
         let pattern = DirectionPattern::new((0, m), Repeat::Once);
         grid.pattern(pos, pattern)
             .positions()
-            .filter_map(|(pos, o)| {
-                match o {
-                    // Same Color Piece
-                    Some(p) if p.pcolor() == self.pcolor() => {
-                        None 
-                    }
-                    //Everything else
-                    _ => Some(pos) 
-                }
-            })
+            .filter(|(_, o)| !self.same_pcolor(o))
+            .map(|(pos, _)| pos)
             .collect()
     }
 

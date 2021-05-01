@@ -6,6 +6,10 @@ pub trait Piece {
     fn image(&self) -> &graphics::Image;
     fn possible_moves(&self, grid: &Grid<BoardPiece>, pos: Position) -> Vec<Position>;
     fn pcolor(&self) -> PColor;
+
+    fn same_pcolor(&self, o: &Option<Box<dyn Piece>>) -> bool {
+        matches!(o, Some(p) if p.pcolor() == self.pcolor()) 
+    }
 }
 
 mod pawn;
