@@ -118,7 +118,6 @@ impl EventHandler for BoardGame {
             self.resize_board(ctx);
             self.resize_picker(ctx);
             self.has_resized = false;
-            println!("test");
         }
 
         graphics::draw(ctx, &self.board, DrawParam::default())?;

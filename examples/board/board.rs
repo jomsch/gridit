@@ -79,7 +79,11 @@ impl Board {
 
     pub fn hover_field(&mut self, point: Point2<f32>) {
         let clicked_pos = self.get_grid_position(point);
-        self.hover_field = Some(clicked_pos);
+        if matches!(self.selected_field, Some(pos) if pos == clicked_pos) {
+            self.hover_field = None
+        } else {
+            self.hover_field = Some(clicked_pos);
+        }
     }
 
     pub fn unhover(&mut self) {
