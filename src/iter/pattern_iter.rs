@@ -35,7 +35,7 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
 }
 
 impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
-    fn positions(self) -> Positions<Self> {
+    fn grid_positions(self) -> Positions<Self> {
         Positions {
             prev_position: Some(self.prev_position),
             next_pos: |inner, prev| {
@@ -132,7 +132,7 @@ mod test {
         };
 
         let pattern = DirectionPattern::new((-1, -1), Repeat::Times(2));
-        let mut iter = grid.pattern((3, 3), pattern).positions();
+        let mut iter = grid.pattern((3, 3), pattern).grid_positions();
         assert_eq!(iter.next(), Some(((2, 2).into(), &10)));
         assert_eq!(iter.next(), Some(((1, 1).into(), &5)));
         assert_eq!(iter.next(), None);
@@ -196,7 +196,7 @@ mod test {
         let seq: Vec<(i32, i32)> = vec![(1, 0), (0, 1), (-1, 0), (0, -1)];
         let pattern = SequencePattern::new(seq);
 
-        let mut iter = grid.pattern((0, 1), pattern).positions();
+        let mut iter = grid.pattern((0, 1), pattern).grid_positions();
         assert_eq!(iter.next(), Some(((1, 1).into(), &3)));
         assert_eq!(iter.next(), Some(((1, 2).into(), &5)));
         assert_eq!(iter.next(), Some(((0, 2).into(), &4)));

@@ -102,7 +102,7 @@ impl Drawable for Board {
         let (bx, by) = (self.rect.x, self.rect.y);
         let rect_size = self.rect.w / 8.0;
 
-        for (position, piece) in self.grid.iter().positions() {
+        for (position, piece) in self.grid.iter().grid_positions() {
             let (x, y) = position.into();
             let bg_color = match (x + y) % 2 == 0 {
                 true => WHITE,

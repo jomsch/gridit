@@ -13,8 +13,10 @@ pub trait Piece {
 }
 
 mod pawn;
+mod rook;
 
 pub use pawn::Pawn;
+pub use rook::Rook;
 
 
 #[derive(Copy, Clone, PartialEq, Eq)]
@@ -35,13 +37,27 @@ impl PColor {
 #[derive(Copy, Clone)]
 pub enum Name {
     PAWN,
+    ROOK,
 }
 
 pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece> {
     let prefix = pcolor.as_prefix();
-    Box::new(match name {
+    match name {
         Name::PAWN => {
-            Pawn::new(pcolor, graphics::Image::new(ctx, format!("/{}_pawn.png", prefix)).unwrap())
+            Box::new(
+                Pawn::new(
+                    pcolor, 
+                    graphics::Image::new(ctx, format!("/{}_pawn.png", prefix)).unwrap()
+                )
+            )
         }
-    })
+        Name::ROOK => {
+            Box::new(
+                    Rook::new(
+                        pcolor, 
+                        graphics::Image::new(ctx, format!("/{}_rook.png", prefix)).unwrap()
+                    )
+            )
+        }
+    }
 }

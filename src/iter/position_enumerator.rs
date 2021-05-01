@@ -10,7 +10,7 @@ pub trait PositionsEnumerator
 where
     Self: Sized,
 {
-    fn positions(self) -> Positions<Self>;
+    fn grid_positions(self) -> Positions<Self>;
 }
 
 impl<I: Iterator> Iterator for Positions<I> {

@@ -1,5 +1,5 @@
 use super::{BoardPiece, Piece, PColor};
-use ggez::{graphics, filesystem};
+use ggez::graphics;
 use gridit::{Grid, NeighborIter, PositionsEnumerator, Position, DirectionPattern, PatternIter, Repeat};
 
 pub struct Pawn {
@@ -29,7 +29,7 @@ impl Piece for Pawn {
 
         let pattern = DirectionPattern::new((0, m), Repeat::Once);
         grid.pattern(pos, pattern)
-            .positions()
+            .grid_positions()
             .filter(|(_, o)| !self.same_pcolor(o))
             .map(|(pos, _)| pos)
             .collect()

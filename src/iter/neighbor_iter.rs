@@ -22,7 +22,7 @@ impl<'a, T> Iterator for NeighborIter<'a, T> {
 }
 
 impl<'a, T> PositionsEnumerator for NeighborIter<'a, T> {
-    fn positions(self) -> Positions<Self> {
+    fn grid_positions(self) -> Positions<Self> {
         Positions {
             inner: self,
             next_pos: |inner, _| {
@@ -106,7 +106,7 @@ mod tests {
             cells: (0..9).collect(),
         };
 
-        let mut neighbor_pos = grid.neighbors((1, 1)).positions();
+        let mut neighbor_pos = grid.neighbors((1, 1)).grid_positions();
         assert_eq!(neighbor_pos.next(), Some(((0, 0).into(), &0)));
         assert_eq!(neighbor_pos.next(), Some(((1, 0).into(), &1)));
         assert_eq!(neighbor_pos.next(), Some(((2, 0).into(), &2)));
@@ -126,7 +126,7 @@ mod tests {
             cells: (0..4).collect(),
         };
 
-        let mut neighbor_pos = grid.neighbors((1, 1)).positions();
+        let mut neighbor_pos = grid.neighbors((1, 1)).grid_positions();
         assert_eq!(neighbor_pos.next(), Some(((0, 0).into(), &0)));
         assert_eq!(neighbor_pos.next(), Some(((1, 0).into(), &1)));
         assert_eq!(neighbor_pos.next(), Some(((0, 1).into(), &2)));

@@ -13,7 +13,7 @@ impl<'a, T> Iterator for GridIter<'a, T> {
 }
 
 impl<'a, T: 'static> PositionsEnumerator for GridIter<'a, T> {
-    fn positions(self) -> Positions<GridIter<'a, T>> {
+    fn grid_positions(self) -> Positions<GridIter<'a, T>> {
         Positions {
             inner: self,
             prev_position: None,
@@ -45,7 +45,7 @@ impl<'a, T> Iterator for GridIterMut<'a, T> {
 }
 
 impl<'a, T: 'static> PositionsEnumerator for GridIterMut<'a, T> {
-    fn positions(self) -> Positions<Self> {
+    fn grid_positions(self) -> Positions<Self> {
         Positions {
             inner: self,
             prev_position: None,
@@ -86,7 +86,7 @@ mod tests {
     #[test]
     fn grid_iter_positions() {
         let grid = Grid::new(2, 2, 9usize);
-        let mut iter = grid.iter().positions();
+        let mut iter = grid.iter().grid_positions();
 
         assert_eq!(iter.next(), Some(((0, 0).into(), &9)));
         assert_eq!(iter.next(), Some(((1, 0).into(), &9)));
@@ -113,7 +113,7 @@ mod tests {
     #[test]
     fn grid_iter_mut_positions() {
         let mut grid = Grid::new(2, 2, 9usize);
-        let mut iter = grid.iter_mut().positions();
+        let mut iter = grid.iter_mut().grid_positions();
 
         assert_eq!(iter.next(), Some(((0, 0).into(), &mut 9)));
         assert_eq!(iter.next(), Some(((1, 0).into(), &mut 9)));

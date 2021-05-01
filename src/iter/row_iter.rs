@@ -13,7 +13,7 @@ impl<'a, T> Iterator for RowIter<'a, T> {
 }
 
 impl<'a, T: 'static> PositionsEnumerator for RowIter<'a, T> {
-    fn positions(self) -> Positions<Self> {
+    fn grid_positions(self) -> Positions<Self> {
         Positions {
             next_pos: |inner, prev_pos| {
                 match prev_pos {
@@ -41,7 +41,7 @@ impl<'a, T> Iterator for RowIterMut<'a, T> {
 }
 
 impl <'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
-    fn positions(self) -> Positions<Self> {
+    fn grid_positions(self) -> Positions<Self> {
         Positions {
             next_pos: |inner, prev_pos| {
                 match prev_pos {
@@ -117,7 +117,7 @@ mod tests {
             cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
         };
 
-        let mut row_pos = grid.row(1).positions();
+        let mut row_pos = grid.row(1).grid_positions();
         assert_eq!(row_pos.next(), Some(((0, 1).into(), &1)));
         assert_eq!(row_pos.next(), Some(((1, 1).into(), &1)));
         assert_eq!(row_pos.next(), Some(((2, 1).into(), &1)));
@@ -182,14 +182,14 @@ mod tests {
             cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
         };
 
-        let mut row_pos = grid.row_mut(1).positions();
+        let mut row_pos = grid.row_mut(1).grid_positions();
         assert_eq!(row_pos.next(), Some(((0, 1).into(), &mut 1)));
         assert_eq!(row_pos.next(), Some(((1, 1).into(), &mut 1)));
         assert_eq!(row_pos.next(), Some(((2, 1).into(), &mut 1)));
         assert_eq!(row_pos.next(), Some(((3, 1).into(), &mut 1)));
         assert_eq!(row_pos.next(), None);
 
-        let mut row_pos = grid.row_mut(0).positions();
+        let mut row_pos = grid.row_mut(0).grid_positions();
         assert_eq!(row_pos.next(), Some(((0, 0).into(), &mut 0)));
         assert_eq!(row_pos.next(), Some(((1, 0).into(), &mut 0)));
         assert_eq!(row_pos.next(), Some(((2, 0).into(), &mut 0)));

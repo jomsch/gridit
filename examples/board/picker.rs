@@ -70,8 +70,10 @@ pub struct Picker {
 impl Picker {
     pub fn new(ctx: &mut Context, rect: Rect) -> Self {
         let mut items = Vec::new(); 
-        items.push(PickerItem::new(ctx, Name::PAWN, PColor::WHITE));
         items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::PAWN, PColor::WHITE));
+        items.push(PickerItem::new(ctx, Name::ROOK, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::ROOK, PColor::WHITE));
 
         let mut picker = Self { items, rect };
         picker.update_items_rects();

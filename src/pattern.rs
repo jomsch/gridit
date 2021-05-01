@@ -6,14 +6,14 @@ pub trait Pattern {
     fn repeat(&self) -> &Repeat;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Repeat {
     Once,
     TillEnd,
     Times(usize),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct DirectionPattern {
     pub(crate) step: Step,
     pub(crate) repeat: Repeat,
