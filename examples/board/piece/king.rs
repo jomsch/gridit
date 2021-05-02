@@ -1,6 +1,6 @@
-use super::{BoardPiece, Piece, PColor};
+use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{Grid, PositionsEnumerator, Position};
+use gridit::{Grid, Position, PositionsEnumerator};
 
 pub struct King {
     img: graphics::Image,
@@ -9,10 +9,7 @@ pub struct King {
 
 impl King {
     pub fn new(pcolor: PColor, img: graphics::Image) -> Self {
-        Self {
-            pcolor,
-            img,
-        }
+        Self { pcolor, img }
     }
 }
 

@@ -1,5 +1,5 @@
+use super::{Positions, PositionsEnumerator};
 use crate::grid::{Grid, Position};
-use super::{PositionsEnumerator, Positions};
 
 pub struct NeighborIter<'a, T> {
     pub(crate) positions: Vec<Position>,
@@ -12,7 +12,7 @@ impl<'a, T> Iterator for NeighborIter<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.idx >= self.positions.len() {
-            return None
+            return None;
         }
         let pos = self.positions[self.idx];
         self.idx += 1;

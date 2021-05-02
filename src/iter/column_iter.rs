@@ -1,7 +1,7 @@
+use super::{Positions, PositionsEnumerator};
 use crate::iter::GridIterMut;
 use crate::Grid;
 use std::iter::{Skip, StepBy};
-use super::{PositionsEnumerator, Positions};
 
 pub struct ColumnIter<'a, T> {
     pub(crate) row_idx: usize,
@@ -47,11 +47,9 @@ impl<'a, T: 'static> PositionsEnumerator for ColumnIterMut<'a, T> {
         Positions {
             inner: self,
             prev_position: None,
-            next_pos: |inner, prev_pos| {
-                match prev_pos {
-                    None => (inner.col_idx, 0).into(),
-                    Some(p) => (p.x, p.y + 1).into(),
-                }
+            next_pos: |inner, prev_pos| match prev_pos {
+                None => (inner.col_idx, 0).into(),
+                Some(p) => (p.x, p.y + 1).into(),
             },
         }
     }

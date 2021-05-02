@@ -1,6 +1,6 @@
-use super::{BoardPiece, Piece, PColor};
+use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{Grid, PositionsEnumerator, Position, DirectionPattern, Repeat};
+use gridit::{DirectionPattern, Grid, Position, PositionsEnumerator, Repeat};
 
 pub struct Pawn {
     img: graphics::Image,
@@ -9,10 +9,7 @@ pub struct Pawn {
 
 impl Pawn {
     pub fn new(pcolor: PColor, img: graphics::Image) -> Self {
-        Self {
-            pcolor,
-            img,
-        }
+        Self { pcolor, img }
     }
 }
 

@@ -1,18 +1,17 @@
 use ggez::event::{self, EventHandler, MouseButton};
+use ggez::graphics::DrawParam;
+use ggez::graphics::Rect;
 use ggez::input::mouse;
 use ggez::mint::Point2;
-use ggez::graphics::DrawParam;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
-use ggez::graphics::Rect;
 use gridit::GridBuilder;
 
 mod board;
-mod piece;
 mod picker;
+mod piece;
 use crate::board::*;
-use crate::piece::*;
 use crate::picker::*;
-
+use crate::piece::*;
 
 fn main() {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -38,19 +37,14 @@ struct BoardGame {
 
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
-        let items: Vec<BoardPiece> = (0..64).map(|_|None).collect();
-        let mut grid = GridBuilder::new()
-            .from(items)
-            .width(8)
-            .height(8)
-            .build();
-
+        let items: Vec<BoardPiece> = (0..64).map(|_| None).collect();
+        let mut grid = GridBuilder::new().from(items).width(8).height(8).build();
 
         grid.set_unchecked((4, 4), Some(new_piece(ctx, Name::PAWN, PColor::BLACK)));
 
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
 
-        Self { 
+        Self {
             board: Board::new(grid, (50.0, 50.0), 400.0),
             picker: Picker::new(ctx, Rect::new(550., 50., 200., 700.)),
             has_resized: true,
@@ -62,13 +56,14 @@ impl BoardGame {
     fn resize_board(&mut self, ctx: &Context) {
         let hdpi_factor = graphics::window(ctx).scale_factor() as f32;
         let (x, y) = graphics::size(ctx);
-        let size = if x >= y {
-            y
-        } else {
-            x * 0.8
-        };
+        let size = if x >= y { y } else { x * 0.8 };
         let padding = 50.0;
-        let draw_rect = Rect::new(padding, padding, size*hdpi_factor-(padding*2.), size*hdpi_factor-(padding*2.));
+        let draw_rect = Rect::new(
+            padding,
+            padding,
+            size * hdpi_factor - (padding * 2.),
+            size * hdpi_factor - (padding * 2.),
+        );
         self.board.set_rect(draw_rect);
     }
 
@@ -79,9 +74,13 @@ impl BoardGame {
         let width = x * 0.20;
         let padding = 50.0;
 
-        let draw_rect = Rect::new((x-width)*hdpi_factor, padding, width*hdpi_factor-(padding*2.), height*hdpi_factor-(padding*2.));
+        let draw_rect = Rect::new(
+            (x - width) * hdpi_factor,
+            padding,
+            width * hdpi_factor - (padding * 2.),
+            height * hdpi_factor - (padding * 2.),
+        );
         self.picker.set_rect(draw_rect);
-         
     }
 }
 
@@ -110,7 +109,7 @@ impl EventHandler for BoardGame {
         if self.has_resized || self.hdpi_factor != hdpi_factor {
             self.hdpi_factor = hdpi_factor;
             let (x, y) = graphics::size(&ctx);
-            let draw_rect = Rect::new(0.0, 0.0, x*hdpi_factor, y*hdpi_factor);
+            let draw_rect = Rect::new(0.0, 0.0, x * hdpi_factor, y * hdpi_factor);
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);
             self.resize_picker(ctx);
@@ -123,36 +122,42 @@ impl EventHandler for BoardGame {
         if let Some(item) = &self.draggin {
             let mpos = mouse::position(ctx);
             let img = &item.0;
-            let img_center_w = (img.width()/2) as f32;
+            let img_center_w = (img.width() / 2) as f32;
             let img_h = (img.height()) as f32;
-            let dest: Point2<f32 >= [(mpos.x - img_center_w), (mpos.y - img_h)].into();
+            let dest: Point2<f32> = [(mpos.x - img_center_w), (mpos.y - img_h)].into();
             graphics::draw(ctx, img, DrawParam::default().dest(dest))?;
         }
         graphics::present(ctx)
     }
 
     fn resize_event(&mut self, _ctx: &mut Context, _width: f32, _height: f32) {
-        self.has_resized = true;        
+        self.has_resized = true;
     }
 
     fn mouse_button_up_event(&mut self, ctx: &mut Context, _button: MouseButton, x: f32, y: f32) {
         let mpoint = [x, y].into();
         if self.board.contains_point(mpoint) && self.draggin.is_some() {
-            let info = self.draggin.take(); 
-            let (_, name, pcolor) = info.unwrap(); 
+            let info = self.draggin.take();
+            let (_, name, pcolor) = info.unwrap();
             self.board.set_field(mpoint, new_piece(ctx, name, pcolor));
         } else if self.draggin.is_some() {
             self.draggin = None;
         }
     }
 
-    fn mouse_button_down_event(&mut self, _ctx: &mut Context, _button: MouseButton, x: f32, y: f32) {
+    fn mouse_button_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        _button: MouseButton,
+        x: f32,
+        y: f32,
+    ) {
         let mpoint = [x, y].into();
         if self.board.contains_point(mpoint) {
             self.board.select_field(mpoint);
             return;
-        } 
-        if self.picker.contains_point(mpoint){
+        }
+        if self.picker.contains_point(mpoint) {
             if self.picker.on_dragable(mpoint) {
                 let piece_info = self.picker.get_item_at(mpoint);
                 self.draggin = Some(piece_info);

@@ -1,24 +1,23 @@
-use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ggez::graphics::{
-    size, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, StrokeOptions, Mesh, Rect,
+    size, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Mesh, Rect, StrokeOptions,
 };
 use ggez::mint::Point2;
+use ggez::{graphics, Context, ContextBuilder, GameResult};
 
-use gridit::{Grid, PositionsEnumerator, Position};
+use gridit::{Grid, Position, PositionsEnumerator};
 
 use crate::piece::Piece;
 
 pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
 pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
-pub const SELECT: Color = Color::new(186./255., 202./255., 68./255., 0.9);
+pub const SELECT: Color = Color::new(186. / 255., 202. / 255., 68. / 255., 0.9);
 pub const HOVER: Color = Color::new(0.5, 0.5, 0.5, 0.7);
-pub const RED: Color = Color::new(186./255., 68./255., 68./255., 1.0);
-
+pub const RED: Color = Color::new(186. / 255., 68. / 255., 68. / 255., 1.0);
 
 pub type BoardPiece = Option<Box<dyn Piece>>;
 
 pub struct Board {
-    pub grid :Grid<BoardPiece>,
+    pub grid: Grid<BoardPiece>,
     rect: Rect,
     selected_field: Option<Position>,
     hover_field: Option<Position>,
@@ -27,7 +26,12 @@ pub struct Board {
 impl Board {
     pub fn new(grid: Grid<BoardPiece>, xy: (f32, f32), size: f32) -> Self {
         let rect = Rect::new(xy.0, xy.1, size, size);
-        Self { grid, rect, selected_field: None, hover_field: None }
+        Self {
+            grid,
+            rect,
+            selected_field: None,
+            hover_field: None,
+        }
     }
 
     pub fn contains_point(&self, point: Point2<f32>) -> bool {
@@ -45,7 +49,7 @@ impl Board {
     fn get_grid_position(&self, point: Point2<f32>) -> gridit::Position {
         let rect = self.rect;
         let bp = rect.point();
-        let field_size = rect.w/8.0;
+        let field_size = rect.w / 8.0;
         let point = Point2::from([point.x - bp.x, point.y - bp.y]);
         let px = (point.x / field_size) as usize;
         let py = (point.y / field_size) as usize;
@@ -58,11 +62,11 @@ impl Board {
         match (&piece, self.selected_field) {
             (Some(piece), None) => {
                 self.selected_field = Some(clicked_pos);
-            },
+            }
             (_, Some(pos)) => {
                 let selected_piece = self.grid.get_unchecked(pos);
                 if let Some(piece) = selected_piece {
-                    let pmoves =  piece.possible_moves(&self.grid, pos);
+                    let pmoves = piece.possible_moves(&self.grid, pos);
                     if pmoves.contains(&clicked_pos) {
                         self.grid.move_to(pos, clicked_pos);
                     }
@@ -94,11 +98,10 @@ impl Board {
         let clicked_pos = self.get_grid_position(point);
         self.grid.set_unchecked(clicked_pos, Some(piece));
     }
-
 }
 
 impl Drawable for Board {
-    fn draw(&self, ctx: &mut Context, _ : DrawParam) -> GameResult<()> {
+    fn draw(&self, ctx: &mut Context, _: DrawParam) -> GameResult<()> {
         let (bx, by) = (self.rect.x, self.rect.y);
         let rect_size = self.rect.w / 8.0;
 
@@ -112,40 +115,28 @@ impl Drawable for Board {
             let rect_x = fx * rect_size + bx;
             let rect_y = fy * rect_size + by;
             let rect = Rect::new(rect_x, rect_y, rect_size, rect_size);
-            let mrect = Mesh::new_rectangle(
-                ctx,
-                DrawMode::Fill(FillOptions::default()),
-                rect,
-                bg_color,
-            )?;
+            let mrect =
+                Mesh::new_rectangle(ctx, DrawMode::Fill(FillOptions::default()), rect, bg_color)?;
             graphics::draw(ctx, &mrect, DrawParam::default())?;
 
             if self.selected_field == Some(position) {
-                let mrect = Mesh::new_rectangle(
-                    ctx,
-                    DrawMode::Fill(FillOptions::default()),
-                    rect,
-                    SELECT,
-                )?;
+                let mrect =
+                    Mesh::new_rectangle(ctx, DrawMode::Fill(FillOptions::default()), rect, SELECT)?;
                 mrect.draw(ctx, DrawParam::default())?;
             }
 
             if self.hover_field == Some(position) {
-                let mrect = Mesh::new_rectangle(
-                    ctx,
-                    DrawMode::Fill(FillOptions::default()),
-                    rect,
-                    HOVER,
-                )?;
+                let mrect =
+                    Mesh::new_rectangle(ctx, DrawMode::Fill(FillOptions::default()), rect, HOVER)?;
                 mrect.draw(ctx, DrawParam::default())?;
             }
 
             if let Some(piece) = piece {
                 let img = piece.image();
-                let iw = (img.width()/2) as f32; 
-                let ih = (img.height()/2) as f32; 
-                let rw = rect.w/2.0;
-                let rh = rect.h/2.0;
+                let iw = (img.width() / 2) as f32;
+                let ih = (img.height() / 2) as f32;
+                let rw = rect.w / 2.0;
+                let rh = rect.h / 2.0;
                 let dest = [rect.x + rw - iw, rect.y + rh - ih];
                 img.draw(ctx, DrawParam::new().dest(dest))?;
             }
@@ -161,12 +152,12 @@ impl Drawable for Board {
                     let cx = fx * rect_size + bx;
                     let cy = fy * rect_size + by;
                     let radius: f32 = 30.;
-                    let hs = rect_size/2.;
-                    let hr = radius/2.;
+                    let hs = rect_size / 2.;
+                    let hr = radius / 2.;
                     let point: Point2<f32> = [cx + hs, cy + hs].into();
 
                     let cmesh = Mesh::new_circle(
-                        ctx, 
+                        ctx,
                         DrawMode::Fill(FillOptions::default()),
                         point,
                         radius,
@@ -177,7 +168,6 @@ impl Drawable for Board {
                 }
             }
         }
-
 
         let mrect = Mesh::new_rectangle(
             ctx,

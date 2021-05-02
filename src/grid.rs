@@ -11,19 +11,19 @@ pub struct Position {
 
 impl Position {
     fn new(x: usize, y: usize) -> Self {
-        Self {x, y}
+        Self { x, y }
     }
 }
 
 impl From<(usize, usize)> for Position {
     fn from((x, y): (usize, usize)) -> Self {
-        Self {x, y}
+        Self { x, y }
     }
 }
 
 impl From<Position> for (usize, usize) {
     fn from(pos: Position) -> Self {
-        (pos.x, pos.y) 
+        (pos.x, pos.y)
     }
 }
 
@@ -63,7 +63,7 @@ impl<T: Default> Grid<T> {
     }
 
     pub fn move_to<P: Into<Position>>(&mut self, pos: P, to: P) {
-        let pos = pos.into(); 
+        let pos = pos.into();
         let to = to.into();
 
         if !self.is_bounds(pos) && !self.is_bounds(to) {
@@ -292,7 +292,7 @@ impl<T> Grid<T> {
 
     // Returns every valid neighbor position of x,y
     fn get_neighbor_positions<P: Into<Position>>(&self, pos: P) -> Vec<Position> {
-        let Position {x, y } = pos.into();
+        let Position { x, y } = pos.into();
         let neighbor_position: [(N, N); 8] = [
             (N::N(1), N::N(1)),
             (N::P(0), N::N(1)),
@@ -342,7 +342,7 @@ impl<T> Grid<T> {
     //     }
     // }
 
-    pub fn pattern<'a, P, Pat>(&'a self, pos: P, pattern: Pat) -> PatternIter<'a, T> 
+    pub fn pattern<'a, P, Pat>(&'a self, pos: P, pattern: Pat) -> PatternIter<'a, T>
     where
         P: Into<Position>,
         Pat: Pattern + 'static,

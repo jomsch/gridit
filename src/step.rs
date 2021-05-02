@@ -18,37 +18,38 @@ impl N {
 
     fn from_isize(n: isize) -> Self {
         if n < 0 {
-            return N::N((n*-1) as usize);
+            return N::N((n * -1) as usize);
         }
         N::P(n as usize)
     }
 
     fn from_i32(n: i32) -> Self {
         if n < 0 {
-            return N::N((n*-1) as usize);
+            return N::N((n * -1) as usize);
         }
         N::P(n as usize)
     }
 
     pub(crate) fn checked_add_sub(&self, n: usize) -> Option<usize> {
-        Some(
-        match self {
+        Some(match self {
             N::N(pn) => n.checked_sub(*pn)?,
             N::P(pn) => n.checked_add(*pn)?,
-        }
-        )
+        })
     }
 }
 
 #[derive(Copy, Clone, Debug)]
 pub struct Step {
-    x: N, 
+    x: N,
     y: N,
 }
 
 impl Step {
     pub fn new(x: usize, y: usize) -> Self {
-        Step { x: N::P(x), y: N::P(y) }
+        Step {
+            x: N::P(x),
+            y: N::P(y),
+        }
     }
 
     pub fn negate_x(mut self) -> Self {
@@ -71,7 +72,7 @@ impl Step {
 // TODO Create a better impl for all Numbers T -> (T, T)
 impl From<(usize, usize)> for Step {
     fn from((x, y): (usize, usize)) -> Self {
-        Step::new(x, y) 
+        Step::new(x, y)
     }
 }
 

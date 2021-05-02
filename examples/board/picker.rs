@@ -1,12 +1,12 @@
-use ggez::{Context,  GameResult};
 use ggez::graphics::{
-    Image, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Mesh, Rect,
+    BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Image, Mesh, Rect,
 };
 use ggez::mint::Point2;
+use ggez::{Context, GameResult};
 
 use crate::piece::*;
 
-const BACKGROUND: Color = Color::new(0.8, 0.8, 0.8 ,1.0);
+const BACKGROUND: Color = Color::new(0.8, 0.8, 0.8, 1.0);
 
 pub struct PickerItem {
     item: Box<dyn Piece>,
@@ -22,7 +22,6 @@ impl PickerItem {
             rect: Rect::default(),
             name,
             pcolor,
-
         }
     }
 
@@ -35,29 +34,26 @@ impl Drawable for PickerItem {
     fn draw(&self, ctx: &mut Context, _param: DrawParam) -> GameResult<()> {
         let img_w = self.item.image().width() as f32;
         let img_h = self.item.image().width() as f32;
-        let scale_w = self.rect.w / img_w ;
+        let scale_w = self.rect.w / img_w;
         let scale_h = self.rect.h / img_h;
 
-        self.item
-            .image()
-            .draw(ctx, 
-                DrawParam::new()
+        self.item.image().draw(
+            ctx,
+            DrawParam::new()
                 .dest(self.rect.point())
-                .scale([scale_w, scale_h])
-            )
+                .scale([scale_w, scale_h]),
+        )
     }
 
     fn blend_mode(&self) -> Option<BlendMode> {
-        None 
+        None
     }
 
     fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
-        Some(self.rect) 
+        Some(self.rect)
     }
 
-    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {
-        
-    }
+    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {}
 }
 
 pub struct Picker {
@@ -67,7 +63,7 @@ pub struct Picker {
 
 impl Picker {
     pub fn new(ctx: &mut Context, rect: Rect) -> Self {
-        let mut items = Vec::new(); 
+        let mut items = Vec::new();
         items.push(PickerItem::new(ctx, Name::PAWN, PColor::BLACK));
         items.push(PickerItem::new(ctx, Name::PAWN, PColor::WHITE));
         items.push(PickerItem::new(ctx, Name::ROOK, PColor::BLACK));
@@ -91,16 +87,16 @@ impl Picker {
         let mut wdif = -0.;
         for (i, item) in self.items.iter_mut().enumerate() {
             let padding = 10.;
-            let size = w/2.-(padding*3.);
+            let size = w / 2. - (padding * 3.);
             let m = (i % 2) as f32;
-            let ix = x + padding + (m*(size + padding*3.));
-            let iy = y + padding + (wdif * ( y + size + padding)); 
+            let ix = x + padding + (m * (size + padding * 3.));
+            let iy = y + padding + (wdif * (y + size + padding));
             wdif += m;
 
             let rect = Rect::new(ix, iy, size, size);
             item.set_rect(rect);
         }
-    } 
+    }
 
     pub fn set_rect(&mut self, rect: Rect) {
         self.rect = rect;
@@ -112,14 +108,17 @@ impl Picker {
     }
 
     pub fn on_dragable(&self, point: Point2<f32>) -> bool {
-        self.items.iter()
+        self.items
+            .iter()
             .filter(|i| i.rect.contains(point))
             .next()
             .is_some()
     }
 
-    pub fn get_item_at(&self, at: Point2<f32>) -> (Image, Name, PColor){
-        let item = self.items.iter()
+    pub fn get_item_at(&self, at: Point2<f32>) -> (Image, Name, PColor) {
+        let item = self
+            .items
+            .iter()
             .filter(|i| i.rect.contains(at))
             .next()
             .unwrap();
@@ -133,7 +132,7 @@ impl Drawable for Picker {
             ctx,
             DrawMode::Fill(FillOptions::default()),
             self.rect,
-            BACKGROUND
+            BACKGROUND,
         )?;
 
         mrect.draw(ctx, DrawParam::default())?;
@@ -146,14 +145,12 @@ impl Drawable for Picker {
     }
 
     fn blend_mode(&self) -> Option<BlendMode> {
-        None 
+        None
     }
 
     fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
-        Some(self.rect) 
+        Some(self.rect)
     }
 
-    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {
-        
-    }
+    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {}
 }

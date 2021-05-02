@@ -1,6 +1,6 @@
-use super::{BoardPiece, Piece, PColor};
+use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{Grid, PositionsEnumerator, Position, DirectionPattern, Repeat};
+use gridit::{DirectionPattern, Grid, Position, PositionsEnumerator, Repeat};
 
 pub struct Queen {
     img: graphics::Image,
@@ -9,10 +9,7 @@ pub struct Queen {
 
 impl Queen {
     pub fn new(pcolor: PColor, img: graphics::Image) -> Self {
-        Self {
-            pcolor,
-            img,
-        }
+        Self { pcolor, img }
     }
 }
 
@@ -23,22 +20,23 @@ impl Piece for Queen {
 
     fn possible_moves(&self, grid: &Grid<BoardPiece>, pos: Position) -> Vec<Position> {
         let patterns = [
-            DirectionPattern::new(( 0, 1), Repeat::TillEnd),
-            DirectionPattern::new(( 0,-1), Repeat::TillEnd),
-            DirectionPattern::new(( 1, 0), Repeat::TillEnd),
+            DirectionPattern::new((0, 1), Repeat::TillEnd),
+            DirectionPattern::new((0, -1), Repeat::TillEnd),
+            DirectionPattern::new((1, 0), Repeat::TillEnd),
             DirectionPattern::new((-1, 0), Repeat::TillEnd),
-            DirectionPattern::new(( 1, 1), Repeat::TillEnd),
-            DirectionPattern::new(( -1,-1), Repeat::TillEnd),
-            DirectionPattern::new(( 1, -1), Repeat::TillEnd),
+            DirectionPattern::new((1, 1), Repeat::TillEnd),
+            DirectionPattern::new((-1, -1), Repeat::TillEnd),
+            DirectionPattern::new((1, -1), Repeat::TillEnd),
             DirectionPattern::new((-1, 1), Repeat::TillEnd),
         ];
 
-        patterns.iter()
+        patterns
+            .iter()
             .map(|pattern| {
                 let mut prev: &Option<Box<dyn Piece + 'static>> = &None;
                 grid.pattern(pos, *pattern)
                     .grid_positions()
-                    .take_while(|(_, o)| { 
+                    .take_while(|(_, o)| {
                         if matches!(prev, Some(p) if p.pcolor() != self.pcolor) {
                             return false;
                         }

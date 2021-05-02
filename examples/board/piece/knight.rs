@@ -1,6 +1,6 @@
-use super::{BoardPiece, Piece, PColor};
+use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{Grid, PositionsEnumerator, Position, DirectionPattern, Repeat};
+use gridit::{DirectionPattern, Grid, Position, PositionsEnumerator, Repeat};
 
 pub struct Knight {
     img: graphics::Image,
@@ -9,10 +9,7 @@ pub struct Knight {
 
 impl Knight {
     pub fn new(pcolor: PColor, img: graphics::Image) -> Self {
-        Self {
-            pcolor,
-            img,
-        }
+        Self { pcolor, img }
     }
 }
 
@@ -23,12 +20,18 @@ impl Piece for Knight {
 
     fn possible_moves(&self, grid: &Grid<BoardPiece>, pos: Position) -> Vec<Position> {
         let steps: [(i32, i32); 8] = [
-            (1, 2), (2, 1), (-1, 2), 
-            (1, -2), (2, -1),
-            (-2, 1), (-1, -2), (-2, -1),
+            (1, 2),
+            (2, 1),
+            (-1, 2),
+            (1, -2),
+            (2, -1),
+            (-2, 1),
+            (-1, -2),
+            (-2, -1),
         ];
 
-        steps.iter()
+        steps
+            .iter()
             .map(|s| {
                 let pattern = DirectionPattern::new(*s, Repeat::Once);
                 grid.pattern(pos, pattern)

@@ -1,4 +1,4 @@
-use crate::{PositionsEnumerator, Positions, Position};
+use crate::{Position, Positions, PositionsEnumerator};
 
 pub struct RowIter<'a, T> {
     pub(crate) row_iter: std::slice::Iter<'a, T>,
@@ -15,18 +15,15 @@ impl<'a, T> Iterator for RowIter<'a, T> {
 impl<'a, T: 'static> PositionsEnumerator for RowIter<'a, T> {
     fn grid_positions(self) -> Positions<Self> {
         Positions {
-            next_pos: |inner, prev_pos| {
-                match prev_pos {
-                    None => (0, inner.idx).into(),
-                    Some(p) => (p.x + 1, p.y).into()
-                }
+            next_pos: |inner, prev_pos| match prev_pos {
+                None => (0, inner.idx).into(),
+                Some(p) => (p.x + 1, p.y).into(),
             },
             prev_position: None,
-            inner: self
+            inner: self,
         }
     }
 }
-
 
 pub struct RowIterMut<'a, T> {
     pub(crate) row_iter: std::slice::IterMut<'a, T>,
@@ -40,14 +37,12 @@ impl<'a, T> Iterator for RowIterMut<'a, T> {
     }
 }
 
-impl <'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
+impl<'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
     fn grid_positions(self) -> Positions<Self> {
         Positions {
-            next_pos: |inner, prev_pos| {
-                match prev_pos {
-                    None => (0, inner.idx).into(),
-                    Some(p) => (p.x + 1, p.y).into()
-                }
+            next_pos: |inner, prev_pos| match prev_pos {
+                None => (0, inner.idx).into(),
+                Some(p) => (p.x + 1, p.y).into(),
             },
             prev_position: None,
             inner: self,
@@ -57,15 +52,15 @@ impl <'a, T: 'static> PositionsEnumerator for RowIterMut<'a, T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::Grid;
     use super::*;
+    use crate::Grid;
 
     #[test]
     fn row_iter_1x2() {
-        let grid =  Grid {
+        let grid = Grid {
             width: 1,
             height: 2,
-            cells: vec![0, 1]
+            cells: vec![0, 1],
         };
 
         let mut row_iter = grid.row(0);
@@ -79,10 +74,10 @@ mod tests {
 
     #[test]
     fn row_iter_2x1() {
-        let grid =  Grid {
+        let grid = Grid {
             width: 2,
             height: 1,
-            cells: vec![0, 1]
+            cells: vec![0, 1],
         };
 
         let mut row_iter = grid.row(0);
@@ -114,7 +109,7 @@ mod tests {
         let grid = Grid {
             width: 4,
             height: 3,
-            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
+            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
         };
 
         let mut row_pos = grid.row(1).grid_positions();
@@ -127,10 +122,10 @@ mod tests {
 
     #[test]
     fn row_iter_mut_1x2() {
-        let mut grid =  Grid {
+        let mut grid = Grid {
             width: 1,
             height: 2,
-            cells: vec![0, 1]
+            cells: vec![0, 1],
         };
 
         let mut row_iter = grid.row_mut(0);
@@ -144,10 +139,10 @@ mod tests {
 
     #[test]
     fn row_iter_mut_2x1() {
-        let mut grid =  Grid {
+        let mut grid = Grid {
             width: 2,
             height: 1,
-            cells: vec![0, 1]
+            cells: vec![0, 1],
         };
 
         let mut row_iter = grid.row_mut(0);
@@ -179,7 +174,7 @@ mod tests {
         let mut grid = Grid {
             width: 4,
             height: 3,
-            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
+            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
         };
 
         let mut row_pos = grid.row_mut(1).grid_positions();

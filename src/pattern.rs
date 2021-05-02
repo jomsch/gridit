@@ -40,9 +40,7 @@ impl Pattern for DirectionPattern {
     fn repeat(&self) -> &Repeat {
         &self.repeat
     }
-
 }
-
 
 pub struct SequencePattern {
     pub(crate) steps: Vec<Step>,
@@ -50,11 +48,10 @@ pub struct SequencePattern {
 }
 
 impl SequencePattern {
-    pub fn new<T: Copy + Into<Step>>(sequence: Vec<T>) -> Self 
-    {
-        Self { 
-            steps: sequence.iter().map(|t| (*t).into()).collect(), 
-            idx: 0 
+    pub fn new<T: Copy + Into<Step>>(sequence: Vec<T>) -> Self {
+        Self {
+            steps: sequence.iter().map(|t| (*t).into()).collect(),
+            idx: 0,
         }
     }
 }
@@ -62,7 +59,7 @@ impl SequencePattern {
 impl Pattern for SequencePattern {
     fn next_step(&mut self) -> Option<Step> {
         self.idx += 1;
-        Some(*self.steps.get(self.idx -1)?)
+        Some(*self.steps.get(self.idx - 1)?)
     }
 
     fn next_step_peek(&self) -> Option<Step> {
