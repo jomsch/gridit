@@ -59,7 +59,7 @@ impl BoardGame {
         let hdpi_factor = graphics::window(ctx).scale_factor() as f32;
         let (x, y) = graphics::size(ctx);
         let size = if x >= y { y } else { x * 0.8 };
-        let padding = 50.0;
+        let padding = x/16.;
         let draw_rect = Rect::new(
             padding,
             padding,
@@ -74,7 +74,7 @@ impl BoardGame {
         let (x, y) = graphics::size(ctx);
         let height = y;
         let width = x * 0.20;
-        let padding = 50.0;
+        let padding = x/16.;
 
         let draw_rect = Rect::new(
             (x - width) * hdpi_factor,
@@ -111,6 +111,7 @@ impl EventHandler for BoardGame {
         if self.has_resized || self.hdpi_factor != hdpi_factor {
             self.hdpi_factor = hdpi_factor;
             let (x, y) = graphics::size(&ctx);
+            dbg!(x, y);
             let draw_rect = Rect::new(0.0, 0.0, x * hdpi_factor, y * hdpi_factor);
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);

@@ -86,7 +86,7 @@ impl Picker {
         let Rect { x, y, w, .. } = self.rect;
         let mut wdif = -0.;
         for (i, item) in self.items.iter_mut().enumerate() {
-            let padding = 10.;
+            let padding = w/20.;
             let size = w / 2. - (padding * 3.);
             let m = (i % 2) as f32;
             let ix = x + padding + (m * (size + padding * 3.));
