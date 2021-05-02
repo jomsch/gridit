@@ -90,7 +90,7 @@ impl Picker {
             let size = w / 2. - (padding * 3.);
             let m = (i % 2) as f32;
             let ix = x + padding + (m * (size + padding * 3.));
-            let iy = y + padding + (wdif * (y + size + padding));
+            let iy = y + padding + (wdif * (size + padding));
             wdif += m;
 
             let rect = Rect::new(ix, iy, size, size);
