@@ -6,11 +6,13 @@ mod pawn;
 mod rook;
 mod bishop;
 mod knight;
+mod queen;
 
 pub use pawn::Pawn;
 pub use rook::Rook;
 pub use bishop::Bishop;
 pub use knight::Knight;
+pub use queen::Queen;
 
 pub trait Piece {
     fn image(&self) -> &graphics::Image;
@@ -45,6 +47,7 @@ pub enum Name {
     ROOK,
     BISHOP,
     KNIGHT,
+    QUEEN,
 }
 
 pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece> {
@@ -64,6 +67,10 @@ pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece
         },
         Name::KNIGHT => {
             let p = Knight::new(pcolor,graphics::Image::new(ctx, format!("/{}_knight.png", prefix)).unwrap());
+            Box::new(p)
+        },
+        Name::QUEEN => {
+            let p = Queen::new(pcolor,graphics::Image::new(ctx, format!("/{}_queen.png", prefix)).unwrap());
             Box::new(p)
         },
     }
