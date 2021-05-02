@@ -6,7 +6,7 @@ use ggez::{Context, GameResult};
 
 use crate::piece::*;
 
-const BACKGROUND: Color = Color::new(0.8, 0.8, 0.8, 1.0);
+const BACKGROUND: Color = Color::new(160./255., 121./255., 61./255., 1.0);
 
 pub struct PickerItem {
     item: Box<dyn Piece>,

@@ -13,6 +13,8 @@ use crate::board::*;
 use crate::picker::*;
 use crate::piece::*;
 
+const BACKGROUND: graphics::Color = graphics::Color::new(100./255., 61./255., 1./255., 1.0);
+
 fn main() {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let mut path = std::path::PathBuf::from(manifest_dir);
@@ -104,7 +106,7 @@ impl EventHandler for BoardGame {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, graphics::Color::new(0.25, 0.25, 0.25, 1.0));
+        graphics::clear(ctx, BACKGROUND);
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
         if self.has_resized || self.hdpi_factor != hdpi_factor {
             self.hdpi_factor = hdpi_factor;

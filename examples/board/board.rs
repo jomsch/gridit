@@ -8,11 +8,10 @@ use gridit::{Grid, Position, PositionsEnumerator};
 
 use crate::piece::Piece;
 
-pub const WHITE: Color = Color::new(0.85, 0.85, 0.85, 1.0);
-pub const BLACK: Color = Color::new(0.15, 0.15, 0.15, 1.0);
-pub const SELECT: Color = Color::new(186. / 255., 202. / 255., 68. / 255., 0.9);
+pub const WHITE: Color = Color::new(210./255., 171./255.,111./255., 1.0);
+pub const BLACK: Color = Color::new(155./255., 111./255.,51./255., 1.0);
+pub const SELECT: Color = Color::new(34. / 255., 201. / 255., 220./ 255., 1.0);
 pub const HOVER: Color = Color::new(0.5, 0.5, 0.5, 0.7);
-pub const RED: Color = Color::new(186. / 255., 68. / 255., 68. / 255., 1.0);
 
 pub type BoardPiece = Option<Box<dyn Piece>>;
 
@@ -147,7 +146,7 @@ impl Drawable for Board {
                     let (fx, fy) = (x as f32, y as f32);
                     let cx = fx * rect_size + bx;
                     let cy = fy * rect_size + by;
-                    let radius: f32 = 30.;
+                    let radius: f32 = 15.;
                     let hs = rect_size / 2.;
                     let point: Point2<f32> = [cx + hs, cy + hs].into();
 
@@ -157,7 +156,7 @@ impl Drawable for Board {
                         point,
                         radius,
                         1.,
-                        RED,
+                        SELECT,
                     )?;
                     cmesh.draw(ctx, DrawParam::default())?;
                 }
