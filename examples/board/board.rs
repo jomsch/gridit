@@ -128,12 +128,17 @@ impl Drawable for Board {
 
             if let Some(piece) = piece {
                 let img = piece.image();
-                let iw = (img.width() / 2) as f32;
-                let ih = (img.height() / 2) as f32;
+                let mut drect = rect;
+                drect.scale(0.75, 0.75);
+                let img_rect = img.dimensions();
+                let sx = drect.w/img_rect.w;
+                let sy = drect.h/img_rect.h;
+                let iw = drect.w / 2.;
+                let ih = drect.h / 2.;
                 let rw = rect.w / 2.0;
                 let rh = rect.h / 2.0;
                 let dest = [rect.x + rw - iw, rect.y + rh - ih];
-                img.draw(ctx, DrawParam::new().dest(dest))?;
+                img.draw(ctx, DrawParam::new().dest(dest).scale([sx, sy]))?;
             }
         }
 
