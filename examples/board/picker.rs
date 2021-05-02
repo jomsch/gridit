@@ -28,20 +28,23 @@ impl PickerItem {
     fn set_rect(&mut self, rect: Rect) {
         self.rect = rect;
     }
-}
 
-impl Drawable for PickerItem {
-    fn draw(&self, ctx: &mut Context, _param: DrawParam) -> GameResult<()> {
+    pub fn img_scale(&self) -> [f32; 2] {
         let img_w = self.item.image().width() as f32;
         let img_h = self.item.image().width() as f32;
         let scale_w = self.rect.w / img_w;
         let scale_h = self.rect.h / img_h;
+        [scale_w, scale_h]
+    }
+}
 
+impl Drawable for PickerItem {
+    fn draw(&self, ctx: &mut Context, _param: DrawParam) -> GameResult<()> {
         self.item.image().draw(
             ctx,
             DrawParam::new()
                 .dest(self.rect.point())
-                .scale([scale_w, scale_h]),
+                .scale(self.img_scale()),
         )
     }
 
@@ -115,14 +118,14 @@ impl Picker {
             .is_some()
     }
 
-    pub fn get_item_at(&self, at: Point2<f32>) -> (Image, Name, PColor) {
+    pub fn get_item_at(&self, at: Point2<f32>) -> (Image, Name, PColor, [f32; 2]) {
         let item = self
             .items
             .iter()
             .filter(|i| i.rect.contains(at))
             .next()
             .unwrap();
-        (item.item.image().clone(), item.name, item.pcolor)
+        (item.item.image().clone(), item.name, item.pcolor, item.img_scale())
     }
 }
 

@@ -34,7 +34,7 @@ struct BoardGame {
     picker: Picker,
     has_resized: bool,
     hdpi_factor: f32,
-    draggin: Option<(graphics::Image, Name, PColor)>,
+    draggin: Option<(graphics::Image, Name, PColor, [f32; 2])>,
 }
 
 impl BoardGame {
@@ -123,11 +123,13 @@ impl EventHandler for BoardGame {
 
         if let Some(item) = &self.draggin {
             let mpos = mouse::position(ctx);
+            let [sx, sy] = item.3;
             let img = &item.0;
-            let img_center_w = (img.width() / 2) as f32;
-            let img_h = (img.height()) as f32;
-            let dest: Point2<f32> = [(mpos.x - img_center_w), (mpos.y - img_h)].into();
-            graphics::draw(ctx, img, DrawParam::default().dest(dest))?;
+            let mut ir = img.dimensions();
+            ir.scale(sx, sy);
+            let img_center_w = ir.w / 2.;
+            let dest: Point2<f32> = [(mpos.x - img_center_w), (mpos.y - ir.h)].into();
+            graphics::draw(ctx, img, DrawParam::default().dest(dest).scale(item.3))?;
         }
         graphics::present(ctx)
     }
@@ -140,7 +142,7 @@ impl EventHandler for BoardGame {
         let mpoint = [x, y].into();
         if self.board.contains_point(mpoint) && self.draggin.is_some() {
             let info = self.draggin.take();
-            let (_, name, pcolor) = info.unwrap();
+            let (_, name, pcolor, _) = info.unwrap();
             self.board.set_field(mpoint, new_piece(ctx, name, pcolor));
         } else if self.draggin.is_some() {
             self.draggin = None;
