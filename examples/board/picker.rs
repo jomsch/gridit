@@ -1,10 +1,8 @@
-use ggez::{graphics, Context, ContextBuilder, GameResult};
+use ggez::{Context,  GameResult};
 use ggez::graphics::{
-    Image, size, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, StrokeOptions, Mesh, Rect,
+    Image, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Mesh, Rect,
 };
 use ggez::mint::Point2;
-
-use gridit::{Grid, PositionsEnumerator, Position};
 
 use crate::piece::*;
 
@@ -34,7 +32,7 @@ impl PickerItem {
 }
 
 impl Drawable for PickerItem {
-    fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult<()> {
+    fn draw(&self, ctx: &mut Context, _param: DrawParam) -> GameResult<()> {
         let img_w = self.item.image().width() as f32;
         let img_h = self.item.image().width() as f32;
         let scale_w = self.rect.w / img_w ;
@@ -53,11 +51,11 @@ impl Drawable for PickerItem {
         None 
     }
 
-    fn dimensions(&self, ctx: &mut Context) -> Option<Rect> {
+    fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
         Some(self.rect) 
     }
 
-    fn set_blend_mode(&mut self, mode: Option<BlendMode>) {
+    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {
         
     }
 }
@@ -89,7 +87,7 @@ impl Picker {
     }
 
     fn update_items_rects(&mut self) {
-        let Rect { x, y, w, h } = self.rect;
+        let Rect { x, y, w, .. } = self.rect;
         let mut wdif = -0.;
         for (i, item) in self.items.iter_mut().enumerate() {
             let padding = 10.;
@@ -107,10 +105,6 @@ impl Picker {
     pub fn set_rect(&mut self, rect: Rect) {
         self.rect = rect;
         self.update_items_rects();
-    }
-
-    pub fn rect(&self) -> &Rect {
-        &self.rect
     }
 
     pub fn contains_point(&self, point: Point2<f32>) -> bool {
@@ -134,7 +128,7 @@ impl Picker {
 }
 
 impl Drawable for Picker {
-    fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult<()> {
+    fn draw(&self, ctx: &mut Context, _param: DrawParam) -> GameResult<()> {
         let mrect = Mesh::new_rectangle(
             ctx,
             DrawMode::Fill(FillOptions::default()),
@@ -155,11 +149,11 @@ impl Drawable for Picker {
         None 
     }
 
-    fn dimensions(&self, ctx: &mut Context) -> Option<Rect> {
+    fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
         Some(self.rect) 
     }
 
-    fn set_blend_mode(&mut self, mode: Option<BlendMode>) {
+    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {
         
     }
 }

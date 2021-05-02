@@ -1,6 +1,6 @@
 use super::{BoardPiece, Piece, PColor};
 use ggez::graphics;
-use gridit::{Grid, NeighborIter, PositionsEnumerator, Position, DirectionPattern, PatternIter, Repeat};
+use gridit::{Grid, PositionsEnumerator, Position};
 
 pub struct King {
     img: graphics::Image,

@@ -1,12 +1,9 @@
 use ggez::event::{self, EventHandler, MouseButton};
 use ggez::input::mouse;
-use ggez::input::keyboard::{KeyCode, KeyMods};
 use ggez::mint::Point2;
 use ggez::graphics::DrawParam;
-use ggez::{filesystem, graphics, Context, ContextBuilder, GameResult};
+use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ggez::graphics::Rect;
-use gridit::Grid;
-use gridit::PositionsEnumerator;
 use gridit::GridBuilder;
 
 mod board;
@@ -41,7 +38,7 @@ struct BoardGame {
 
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
-        let mut items: Vec<BoardPiece> = (0..64).map(|_|None).collect();
+        let items: Vec<BoardPiece> = (0..64).map(|_|None).collect();
         let mut grid = GridBuilder::new()
             .from(items)
             .width(8)
@@ -138,7 +135,7 @@ impl EventHandler for BoardGame {
         self.has_resized = true;        
     }
 
-    fn mouse_button_up_event(&mut self, ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
+    fn mouse_button_up_event(&mut self, ctx: &mut Context, _button: MouseButton, x: f32, y: f32) {
         let mpoint = [x, y].into();
         if self.board.contains_point(mpoint) && self.draggin.is_some() {
             let info = self.draggin.take(); 
@@ -149,7 +146,7 @@ impl EventHandler for BoardGame {
         }
     }
 
-    fn mouse_button_down_event(&mut self, ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
+    fn mouse_button_down_event(&mut self, _ctx: &mut Context, _button: MouseButton, x: f32, y: f32) {
         let mpoint = [x, y].into();
         if self.board.contains_point(mpoint) {
             self.board.select_field(mpoint);
