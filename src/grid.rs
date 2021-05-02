@@ -76,6 +76,14 @@ impl<T: Default> Grid<T> {
 }
 
 impl<T> Grid<T> {
+    pub fn from(v: Vec<T>, width: usize, height: usize) -> Self {
+        Self {
+            cells: v,
+            width,
+            height,
+        }
+    }
+
     #[inline]
     fn translate<P: Into<Position>>(&self, pos: P) -> usize {
         let pos = pos.into();

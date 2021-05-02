@@ -4,7 +4,6 @@ use ggez::graphics::Rect;
 use ggez::input::mouse;
 use ggez::mint::Point2;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
-use gridit::GridBuilder;
 
 mod board;
 mod picker;
@@ -40,7 +39,7 @@ struct BoardGame {
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
         let items: Vec<BoardPiece> = (0..64).map(|_| None).collect();
-        let mut grid = GridBuilder::new().from(items).width(8).height(8).build();
+        let mut grid = gridit::Grid::from(items, 8, 8);
 
         grid.set_unchecked((4, 4), Some(new_piece(ctx, Name::PAWN, PColor::BLACK)));
 
