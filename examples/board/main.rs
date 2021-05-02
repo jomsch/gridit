@@ -79,7 +79,7 @@ impl BoardGame {
         let draw_rect = Rect::new(
             (x - width) * hdpi_factor,
             padding,
-            width * hdpi_factor - (padding * 2.),
+            width * hdpi_factor - padding,
             height * hdpi_factor - (padding * 2.),
         );
         self.picker.set_rect(draw_rect);
@@ -111,7 +111,6 @@ impl EventHandler for BoardGame {
         if self.has_resized || self.hdpi_factor != hdpi_factor {
             self.hdpi_factor = hdpi_factor;
             let (x, y) = graphics::size(&ctx);
-            dbg!(x, y);
             let draw_rect = Rect::new(0.0, 0.0, x * hdpi_factor, y * hdpi_factor);
             graphics::set_screen_coordinates(ctx, draw_rect)?;
             self.resize_board(ctx);
