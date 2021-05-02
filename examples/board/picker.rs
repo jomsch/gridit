@@ -80,6 +80,8 @@ impl Picker {
         items.push(PickerItem::new(ctx, Name::KNIGHT, PColor::WHITE));
         items.push(PickerItem::new(ctx, Name::QUEEN, PColor::BLACK));
         items.push(PickerItem::new(ctx, Name::QUEEN, PColor::WHITE));
+        items.push(PickerItem::new(ctx, Name::KING, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::KING, PColor::WHITE));
 
         let mut picker = Self { items, rect };
         picker.update_items_rects();
