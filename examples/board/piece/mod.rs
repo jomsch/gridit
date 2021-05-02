@@ -2,6 +2,16 @@ use ggez::{graphics, Context};
 use gridit::{Position, Grid};
 use crate::BoardPiece;
 
+mod pawn;
+mod rook;
+mod bishop;
+mod knight;
+
+pub use pawn::Pawn;
+pub use rook::Rook;
+pub use bishop::Bishop;
+pub use knight::Knight;
+
 pub trait Piece {
     fn image(&self) -> &graphics::Image;
     fn possible_moves(&self, grid: &Grid<BoardPiece>, pos: Position) -> Vec<Position>;
@@ -12,13 +22,6 @@ pub trait Piece {
     }
 }
 
-mod pawn;
-mod rook;
-mod bishop;
-
-pub use pawn::Pawn;
-pub use rook::Rook;
-pub use bishop::Bishop;
 
 
 #[derive(Copy, Clone, PartialEq, Eq)]
@@ -41,6 +44,7 @@ pub enum Name {
     PAWN,
     ROOK,
     BISHOP,
+    KNIGHT,
 }
 
 pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece> {
@@ -57,6 +61,10 @@ pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece
         Name::BISHOP => {
             let p = Bishop::new(pcolor,graphics::Image::new(ctx, format!("/{}_bishop.png", prefix)).unwrap());
             Box::new(p)
-        }
+        },
+        Name::KNIGHT => {
+            let p = Knight::new(pcolor,graphics::Image::new(ctx, format!("/{}_knight.png", prefix)).unwrap());
+            Box::new(p)
+        },
     }
 }
