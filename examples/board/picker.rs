@@ -74,6 +74,8 @@ impl Picker {
         items.push(PickerItem::new(ctx, Name::PAWN, PColor::WHITE));
         items.push(PickerItem::new(ctx, Name::ROOK, PColor::BLACK));
         items.push(PickerItem::new(ctx, Name::ROOK, PColor::WHITE));
+        items.push(PickerItem::new(ctx, Name::BISHOP, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::BISHOP, PColor::WHITE));
 
         let mut picker = Self { items, rect };
         picker.update_items_rects();

@@ -2,12 +2,12 @@ use super::{BoardPiece, Piece, PColor};
 use ggez::graphics;
 use gridit::{Grid, PositionsEnumerator, Position, DirectionPattern, Repeat};
 
-pub struct Rook {
+pub struct Bishop {
     img: graphics::Image,
     pcolor: PColor,
 }
 
-impl Rook {
+impl Bishop {
     pub fn new(pcolor: PColor, img: graphics::Image) -> Self {
         Self {
             pcolor,
@@ -16,17 +16,17 @@ impl Rook {
     }
 }
 
-impl Piece for Rook {
+impl Piece for Bishop {
     fn image(&self) -> &graphics::Image {
         &self.img
     }
 
     fn possible_moves(&self, grid: &Grid<BoardPiece>, pos: Position) -> Vec<Position> {
         let patterns = [
-            DirectionPattern::new(( 0, 1), Repeat::TillEnd),
-            DirectionPattern::new(( 0,-1), Repeat::TillEnd),
-            DirectionPattern::new(( 1, 0), Repeat::TillEnd),
-            DirectionPattern::new((-1, 0), Repeat::TillEnd),
+            DirectionPattern::new(( 1, 1), Repeat::TillEnd),
+            DirectionPattern::new(( -1,-1), Repeat::TillEnd),
+            DirectionPattern::new(( 1, -1), Repeat::TillEnd),
+            DirectionPattern::new((-1, 1), Repeat::TillEnd),
         ];
 
         patterns.iter()
