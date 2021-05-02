@@ -1,8 +1,8 @@
 use ggez::graphics::{
-    size, BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Mesh, Rect, StrokeOptions,
+    BlendMode, Color, DrawMode, DrawParam, Drawable, FillOptions, Mesh, Rect, StrokeOptions,
 };
 use ggez::mint::Point2;
-use ggez::{graphics, Context, ContextBuilder, GameResult};
+use ggez::{graphics, Context, GameResult};
 
 use gridit::{Grid, Position, PositionsEnumerator};
 
@@ -38,10 +38,6 @@ impl Board {
         self.rect.contains(point)
     }
 
-    pub fn get_rect(&self) -> Rect {
-        self.rect
-    }
-
     pub fn set_rect(&mut self, rect: Rect) {
         self.rect = rect;
     }
@@ -58,9 +54,9 @@ impl Board {
 
     pub fn select_field(&mut self, point: Point2<f32>) {
         let clicked_pos = self.get_grid_position(point);
-        let mut piece = self.grid.get_mut_unchecked(clicked_pos);
+        let piece = self.grid.get_unchecked(clicked_pos);
         match (&piece, self.selected_field) {
-            (Some(piece), None) => {
+            (Some(_piece), None) => {
                 self.selected_field = Some(clicked_pos);
             }
             (_, Some(pos)) => {
@@ -153,7 +149,6 @@ impl Drawable for Board {
                     let cy = fy * rect_size + by;
                     let radius: f32 = 30.;
                     let hs = rect_size / 2.;
-                    let hr = radius / 2.;
                     let point: Point2<f32> = [cx + hs, cy + hs].into();
 
                     let cmesh = Mesh::new_circle(
@@ -180,11 +175,11 @@ impl Drawable for Board {
         Ok(())
     }
 
-    fn dimensions(&self, ctx: &mut Context) -> Option<Rect> {
+    fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
         Some(self.rect)
     }
 
-    fn set_blend_mode(&mut self, mode: Option<BlendMode>) {}
+    fn set_blend_mode(&mut self, _mode: Option<BlendMode>) {}
 
     fn blend_mode(&self) -> Option<BlendMode> {
         None

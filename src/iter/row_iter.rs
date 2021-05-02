@@ -1,4 +1,4 @@
-use crate::{Position, Positions, PositionsEnumerator};
+use crate::{Positions, PositionsEnumerator};
 
 pub struct RowIter<'a, T> {
     pub(crate) row_iter: std::slice::Iter<'a, T>,
