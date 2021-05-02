@@ -144,6 +144,8 @@ impl EventHandler for BoardGame {
             let info = self.draggin.take(); 
             let (_, name, pcolor) = info.unwrap(); 
             self.board.set_field(mpoint, new_piece(ctx, name, pcolor));
+        } else if self.draggin.is_some() {
+            self.draggin = None;
         }
     }
 
