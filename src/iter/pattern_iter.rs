@@ -66,7 +66,7 @@ mod test {
         let grid = Grid {
             width: 4,
             height: 4,
-            cells: (0..16).collect(),
+            items: (0..16).collect(),
         };
 
         let pattern = DirectionPattern::new((0isize, -1), Repeat::TillEnd);
@@ -82,7 +82,7 @@ mod test {
         let grid = Grid {
             width: 4,
             height: 4,
-            cells: (0..16).collect(),
+            items: (0..16).collect(),
         };
 
         let pattern = DirectionPattern::new((1isize, 0), Repeat::TillEnd);
@@ -98,7 +98,7 @@ mod test {
         let grid = Grid {
             width: 4,
             height: 4,
-            cells: (0..16).collect(),
+            items: (0..16).collect(),
         };
 
         let pattern = DirectionPattern::new((0, 1), Repeat::Times(2));
@@ -113,7 +113,7 @@ mod test {
         let grid = Grid {
             width: 4,
             height: 4,
-            cells: (0..16).collect(),
+            items: (0..16).collect(),
         };
 
         let pattern = DirectionPattern::new((-1, 0), Repeat::Once);
@@ -127,7 +127,7 @@ mod test {
         let grid = Grid {
             width: 4,
             height: 4,
-            cells: (0..15).collect(),
+            items: (0..15).collect(),
         };
 
         let pattern = DirectionPattern::new((-1, -1), Repeat::Times(2));
@@ -142,7 +142,7 @@ mod test {
         let grid = Grid {
             width: 3,
             height: 3,
-            cells: (0..9).collect(),
+            items: (0..9).collect(),
         };
 
         let seq: Vec<(i32, i32)> = vec![
@@ -176,7 +176,7 @@ mod test {
         let grid = Grid {
             width: 3,
             height: 3,
-            cells: (0..9).collect(),
+            items: (0..9).collect(),
         };
 
         let seq: Vec<(i32, i32)> = vec![
@@ -208,7 +208,7 @@ mod test {
         let grid = Grid {
             width: 2,
             height: 4,
-            cells: (0..8).collect(),
+            items: (0..8).collect(),
         };
 
         let seq: Vec<(i32, i32)> = vec![(1, 0), (0, 1), (-1, 0), (0, -1)];

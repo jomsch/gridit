@@ -64,7 +64,7 @@ mod tests {
         let grid = Grid {
             width: 2,
             height: 2,
-            cells: vec![0, 1, 0, 1],
+            items: vec![0, 1, 0, 1],
         };
 
         let mut col_iter = grid.column(0);
@@ -83,7 +83,7 @@ mod tests {
         let grid = Grid {
             width: 2,
             height: 2,
-            cells: vec![0, 1, 0, 1],
+            items: vec![0, 1, 0, 1],
         };
 
         let mut col_pos = grid.column(0).grid_positions();
@@ -102,7 +102,7 @@ mod tests {
         let mut grid = Grid {
             width: 2,
             height: 2,
-            cells: vec![0, 1, 0, 1],
+            items: vec![0, 1, 0, 1],
         };
 
         let mut col_iter = grid.column_mut(0);
@@ -121,7 +121,7 @@ mod tests {
         let mut grid = Grid {
             width: 2,
             height: 2,
-            cells: vec![0, 1, 0, 1],
+            items: vec![0, 1, 0, 1],
         };
 
         let mut col_pos = grid.column_mut(0).grid_positions();

@@ -63,7 +63,7 @@ mod tests {
         let grid = Grid {
             width: 3,
             height: 3,
-            cells: (0..9).collect(),
+            items: (0..9).collect(),
         };
 
         // middle
@@ -103,7 +103,7 @@ mod tests {
         let grid = Grid {
             width: 3,
             height: 3,
-            cells: (0..9).collect(),
+            items: (0..9).collect(),
         };
 
         let mut neighbor_pos = grid.neighbors((1, 1)).grid_positions();
@@ -123,7 +123,7 @@ mod tests {
         let grid = Grid {
             width: 2,
             height: 2,
-            cells: (0..4).collect(),
+            items: (0..4).collect(),
         };
 
         let mut neighbor_pos = grid.neighbors((1, 1)).grid_positions();

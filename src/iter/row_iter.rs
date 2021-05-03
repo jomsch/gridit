@@ -60,7 +60,7 @@ mod tests {
         let grid = Grid {
             width: 1,
             height: 2,
-            cells: vec![0, 1],
+            items: vec![0, 1],
         };
 
         let mut row_iter = grid.row(0);
@@ -77,7 +77,7 @@ mod tests {
         let grid = Grid {
             width: 2,
             height: 1,
-            cells: vec![0, 1],
+            items: vec![0, 1],
         };
 
         let mut row_iter = grid.row(0);
@@ -91,7 +91,7 @@ mod tests {
         let grid = Grid {
             width: 2,
             height: 2,
-            cells: vec![0, 0, 1, 1],
+            items: vec![0, 0, 1, 1],
         };
         let mut row_iter = grid.row(0);
         assert_eq!(row_iter.next(), Some(&0));
@@ -109,7 +109,7 @@ mod tests {
         let grid = Grid {
             width: 4,
             height: 3,
-            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
+            items: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
         };
 
         let mut row_pos = grid.row(1).grid_positions();
@@ -125,7 +125,7 @@ mod tests {
         let mut grid = Grid {
             width: 1,
             height: 2,
-            cells: vec![0, 1],
+            items: vec![0, 1],
         };
 
         let mut row_iter = grid.row_mut(0);
@@ -142,7 +142,7 @@ mod tests {
         let mut grid = Grid {
             width: 2,
             height: 1,
-            cells: vec![0, 1],
+            items: vec![0, 1],
         };
 
         let mut row_iter = grid.row_mut(0);
@@ -156,7 +156,7 @@ mod tests {
         let mut grid = Grid {
             width: 2,
             height: 2,
-            cells: vec![0, 0, 1, 1],
+            items: vec![0, 0, 1, 1],
         };
         let mut row_iter = grid.row_mut(0);
         assert_eq!(row_iter.next(), Some(&mut 0));
@@ -174,7 +174,7 @@ mod tests {
         let mut grid = Grid {
             width: 4,
             height: 3,
-            cells: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
+            items: vec![0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
         };
 
         let mut row_pos = grid.row_mut(1).grid_positions();

@@ -28,7 +28,7 @@ mod tests {
         let grid = Grid {
             width: 3,
             height: 2,
-            cells: vec![0; 3 * 2],
+            items: vec![0; 3 * 2],
         };
 
         let mut positions = grid.positions();
