@@ -2,18 +2,18 @@ use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
 use gridit::{DirectionPattern, Grid, Position, PositionsEnumerator, Repeat, Pattern};
 
-pub struct CustomOne {
+pub struct Blocker {
     img: graphics::Image,
     pcolor: PColor,
 }
 
-impl CustomOne {
+impl Blocker {
     pub fn new(pcolor: PColor, img: graphics::Image) -> Self {
         Self { pcolor, img }
     }
 }
 
-impl Piece for CustomOne {
+impl Piece for Blocker {
     fn image(&self) -> &graphics::Image {
         &self.img
     }

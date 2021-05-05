@@ -79,9 +79,10 @@ impl Picker {
         items.push(PickerItem::new(ctx, Name::QUEEN, PColor::WHITE));
         items.push(PickerItem::new(ctx, Name::KING, PColor::BLACK));
         items.push(PickerItem::new(ctx, Name::KING, PColor::WHITE));
-        items.push(PickerItem::new(ctx, Name::CUSTOMONE, PColor::BLACK));
-        items.push(PickerItem::new(ctx, Name::CUSTOMONE, PColor::WHITE));
-
+        items.push(PickerItem::new(ctx, Name::BLOCKER, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::BLOCKER, PColor::WHITE));
+        items.push(PickerItem::new(ctx, Name::GIRAFFE, PColor::BLACK));
+        items.push(PickerItem::new(ctx, Name::GIRAFFE, PColor::WHITE));
         let mut picker = Self { items, rect };
         picker.update_items_rects();
         picker
