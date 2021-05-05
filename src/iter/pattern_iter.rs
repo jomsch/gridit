@@ -35,7 +35,18 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
                 Some(cell)
             },
             Action::StepFromOrigin(step) => {
-                let next_position = step.take_step_from_position(self.origin_position)?;
+                let mut next_position = step.take_step_from_position(self.origin_position);
+                while next_position.is_none() || 
+                    self.grid.get(next_position.unwrap_or((0, 0).into())).is_none() {
+                    let action = self.pattern.next_action()?;
+                    let step = match action {
+                        Action::StepFromOrigin(step) => step,
+                        _ => panic!("different actions per pattern not supported"),
+                    };
+                    next_position = step.take_step_from_position(self.origin_position);
+                }
+                // next_position can only be valid here since we check it in the while loop aboe
+                let next_position = next_position.unwrap();
                 let cell = self.grid.get(next_position)?;
                 self.repeat_count += 1;
                 self.prev_position = next_position;
@@ -66,11 +77,21 @@ impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
 
                     },
                     Action::StepFromOrigin(step) => {
-                            //prev can not be None in this case, since we set prev_position
-                            let origin = inner.origin_position;
-                            step
-                                .take_step_from_position(origin)
-                                .unwrap_or_default()
+                            let origin_position = inner.origin_position;
+                            let mut step = step;
+                            let mut next_position = step.take_step_from_position(origin_position);
+                            let steps = inner.pattern.rest_positions().expect("Implement fn rest_positionn");
+                            let mut steps = steps.iter();
+                            // We can unwrap_or in this while loop since if we are at the end of the 
+                            // iterator, next is called till it will return None in PositionEnuemrator
+                            // Unwarp should always be (0, 0) since then we can leave the loop at the end
+                            while next_position.is_none() || 
+                                !inner.grid.is_bounds(next_position.unwrap_or((0, 0).into())) {
+                                step = *steps.next().unwrap_or(&(0, 0).into());
+                                next_position = step.take_step_from_position(origin_position);
+                            }
+                            // This can only be Some since we checka
+                            next_position.unwrap()
                     },
                     Action::Jump(pos) => {
                         pos
@@ -90,7 +111,7 @@ impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::pattern::{DirectionPattern, StepsPattern};
+    use crate::pattern::{DirectionPattern, StepsPattern, SideStepsPattern};
 
     // 0, 1, 2, 3
     // 4, 5, 6, 7
@@ -173,14 +194,14 @@ mod test {
     }
 
     #[test]
-    fn pattern_iter_sequence() {
+    fn pattern_iter_steps() {
         let grid = Grid {
             width: 3,
             height: 3,
             items: (0..9).collect(),
         };
 
-        let seq: Vec<(i32, i32)> = vec![
+        let steps: Vec<(i32, i32)> = vec![
             (0, -1),
             (1, 0),
             (1, 0),
@@ -191,7 +212,7 @@ mod test {
             (1, 0),
             (1, 0),
         ];
-        let pattern = StepsPattern::new(seq);
+        let pattern = StepsPattern::new(steps);
         let mut iter = grid.pattern((0, 1), pattern);
 
         assert_eq!(iter.next(), Some(&0));
@@ -207,7 +228,7 @@ mod test {
     }
 
     #[test]
-    fn pattern_iter_sequence_cross() {
+    fn pattern_iter_steps_cross() {
         let grid = Grid {
             width: 3,
             height: 3,
@@ -239,15 +260,15 @@ mod test {
     }
 
     #[test]
-    fn pattern_iter_sequence_positions() {
+    fn pattern_iter_steps_positions() {
         let grid = Grid {
             width: 2,
             height: 4,
             items: (0..8).collect(),
         };
 
-        let seq: Vec<(i32, i32)> = vec![(1, 0), (0, 1), (-1, 0), (0, -1)];
-        let pattern = StepsPattern::new(seq);
+        let steps: Vec<(i32, i32)> = vec![(1, 0), (0, 1), (-1, 0), (0, -1)];
+        let pattern = StepsPattern::new(steps);
 
         let mut iter = grid.pattern((0, 1), pattern).grid_positions();
         assert_eq!(iter.next(), Some(((1, 1).into(), &3)));
@@ -256,4 +277,43 @@ mod test {
         assert_eq!(iter.next(), Some(((0, 1).into(), &2)));
         assert_eq!(iter.next(), None);
     }
+
+    #[test]
+    fn pattern_iter_sidesteps() {
+        let grid = Grid {
+            width: 3,
+            height: 3,
+            items: (0..9).collect(),
+        };
+
+        // Every Step greater than 1 should be ignored
+        let sidesteps = vec![(-4, -4), (0, -1), (5, 5), (1, 0), (3, 3),(0, 1), (-1, 0), ];
+        let pattern = SideStepsPattern::new(sidesteps);
+        let mut iter = grid.pattern((1, 1), pattern);
+        assert_eq!(iter.next(), Some(&1));
+        assert_eq!(iter.next(), Some(&5));
+        assert_eq!(iter.next(), Some(&7));
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn pattern_iter_sidesteps_positions() {
+        let grid = Grid {
+            width: 3,
+            height: 3,
+            items: (0..9).collect(),
+        };
+
+        // Every Step greater than 1 should be ignored
+        let sidesteps = vec![(0, -1), (5, 5), (1, 0), (3, 3),(0, 1), (-1, 0), ];
+        let pattern = SideStepsPattern::new(sidesteps);
+        let mut iter = grid.pattern((1, 1), pattern).grid_positions();
+        assert_eq!(iter.next(), Some(((1, 0).into(), &1)));
+        assert_eq!(iter.next(), Some(((2, 1).into(), &5)));
+        assert_eq!(iter.next(), Some(((1, 2).into(), &7)));
+        assert_eq!(iter.next(), Some(((0, 1).into(), &3)));
+        assert_eq!(iter.next(), None);
+    }
+
 }
