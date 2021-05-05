@@ -95,9 +95,13 @@ pub struct SideStepsPattern {
 }
 
 impl SideStepsPattern {
-    pub fn new<T: Copy + Into<Step>>(steps: Vec<T>) -> Self {
+    pub fn new<I>(steps: I) -> Self 
+    where 
+        I: IntoIterator,
+        I::Item: Copy + Into<Step>,
+    {
         Self {
-            steps: steps.iter().map(|t| (*t).into()).collect(),
+            steps: steps.into_iter().map(|t| t.into()).collect(),
             idx: 0,
         }
     }
