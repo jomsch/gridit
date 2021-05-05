@@ -1,9 +1,18 @@
-use crate::Step;
+use crate::{Step, Position};
 
 pub trait Pattern {
-    fn next_step(&mut self) -> Option<Step>;
-    fn next_step_peek(&self) -> Option<Step>;
+    fn next_action(&mut self) -> Option<Action>;
+    fn next_action_peek(&self) -> Option<Action>;
     fn repeat(&self) -> &Repeat;
+}
+
+pub enum Action {
+    // Step from previous position
+    Step(Step),
+    // Step from origin position
+    StepFromOrigin(Step),
+    // Jump to any position
+    Jump(Position),
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -29,12 +38,12 @@ impl DirectionPattern {
 }
 
 impl Pattern for DirectionPattern {
-    fn next_step(&mut self) -> Option<Step> {
-        Some(self.step)
+    fn next_action(&mut self) -> Option<Action> {
+        Some(Action::Step(self.step))
     }
 
-    fn next_step_peek(&self) -> Option<Step> {
-        Some(self.step)
+    fn next_action_peek(&self) -> Option<Action> {
+        Some(Action::Step(self.step))
     }
 
     fn repeat(&self) -> &Repeat {
@@ -42,31 +51,32 @@ impl Pattern for DirectionPattern {
     }
 }
 
-pub struct SequencePattern {
+pub struct StepsPattern {
     pub(crate) steps: Vec<Step>,
     pub(crate) idx: usize,
 }
 
-impl SequencePattern {
-    pub fn new<T: Copy + Into<Step>>(sequence: Vec<T>) -> Self {
+impl StepsPattern {
+    pub fn new<T: Copy + Into<Step>>(steps: Vec<T>) -> Self {
         Self {
-            steps: sequence.iter().map(|t| (*t).into()).collect(),
+            steps: steps.iter().map(|t| (*t).into()).collect(),
             idx: 0,
         }
     }
 }
 
-impl Pattern for SequencePattern {
-    fn next_step(&mut self) -> Option<Step> {
+impl Pattern for StepsPattern {
+    fn next_action(&mut self) -> Option<Action> {
         self.idx += 1;
-        Some(*self.steps.get(self.idx - 1)?)
+        Some(Action::Step(*self.steps.get(self.idx - 1)?))
     }
 
-    fn next_step_peek(&self) -> Option<Step> {
-        Some(*self.steps.get(self.idx)?)
+    fn next_action_peek(&self) -> Option<Action> {
+        Some(Action::Step(*self.steps.get(self.idx)?))
     }
 
     fn repeat(&self) -> &Repeat {
         &Repeat::TillEnd
     }
 }
+

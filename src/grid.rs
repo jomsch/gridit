@@ -547,12 +547,12 @@ impl<T> Grid<T> {
     }
 
     /// Creates an iterator which yields references of every element of pattern starting at position `pos`.  
-    /// See [Pattern],[DirectionPattern] and [SequencePattern] for more details.
+    /// See [Pattern] more details.
     /// # Example
     /// ```
-    /// # use gridit::{Grid, SequencePattern};
+    /// # use gridit::{Grid, StepsPattern};
     /// let mut grid = Grid::from(vec![1, 2, 3, 4], 2, 2); 
-    /// let pattern = SequencePattern::new(vec![(1,0), (-1, 0), (1, 0)]);
+    /// let pattern = StepsPattern::new(vec![(1,0), (-1, 0), (1, 0)]);
     /// let mut iter = grid.pattern((0, 0), pattern);
     /// assert_eq!(iter.next(), Some(&2));
     /// assert_eq!(iter.next(), Some(&1));
@@ -566,6 +566,7 @@ impl<T> Grid<T> {
         let pos = pos.into();
         PatternIter {
             grid: &self,
+            origin_position: pos,
             prev_position: pos,
             pattern: Box::new(pattern),
             repeat_count: 0,

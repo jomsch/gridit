@@ -1,5 +1,5 @@
 use super::{Positions, PositionsEnumerator};
-use crate::pattern::{Pattern, Repeat};
+use crate::pattern::{Pattern, Repeat, Action};
 use crate::{Grid, Position};
 
 pub struct PatternIter<'a, T> {
@@ -7,6 +7,7 @@ pub struct PatternIter<'a, T> {
     pub(crate) prev_position: Position,
     pub(crate) pattern: Box<dyn Pattern>,
     pub(crate) repeat_count: usize,
+    pub(crate) origin_position: Position,
 }
 
 impl<'a, T> PatternIter<'a, T> {
@@ -24,12 +25,29 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.repeation_done()?;
-        let step = self.pattern.next_step()?;
-        let next_position = step.take_step_from_position(self.prev_position)?;
-        let cell = self.grid.get(next_position)?;
-        self.repeat_count += 1;
-        self.prev_position = next_position;
-        Some(cell)
+        let action = self.pattern.next_action()?;
+        match action {
+            Action::Step(step) => {
+                let next_position = step.take_step_from_position(self.prev_position)?;
+                let cell = self.grid.get(next_position)?;
+                self.repeat_count += 1;
+                self.prev_position = next_position;
+                Some(cell)
+            },
+            Action::StepFromOrigin(step) => {
+                let next_position = step.take_step_from_position(self.origin_position)?;
+                let cell = self.grid.get(next_position)?;
+                self.repeat_count += 1;
+                self.prev_position = next_position;
+                Some(cell)
+            },
+            Action::Jump(pos) => {
+                let cell = self.grid.get(pos)?;
+                self.repeat_count += 1;
+                self.prev_position = pos;
+                Some(cell)
+            },
+        }
     }
 }
 
@@ -38,14 +56,31 @@ impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
         Positions {
             prev_position: Some(self.prev_position),
             next_pos: |inner, prev| {
-                // Since we call .next() for the inner later,
-                // we should not do any bound checks here.
-                let step = inner.pattern.next_step_peek().unwrap_or((0, 0).into());
-                //prev can not be None in this case, since we set prev_position
-                let next_position = step
-                    .take_step_from_position(prev.unwrap())
-                    .unwrap_or_default();
-                next_position
+                if let Some(action) =  inner.pattern.next_action_peek() {
+                    return match action {
+                    Action::Step(step) => {
+                            //prev can not be None in this case, since we set prev_position
+                            step
+                                .take_step_from_position(prev.unwrap())
+                                .unwrap_or_default()
+
+                    },
+                    Action::StepFromOrigin(step) => {
+                            //prev can not be None in this case, since we set prev_position
+                            let origin = inner.origin_position;
+                            step
+                                .take_step_from_position(origin)
+                                .unwrap_or_default()
+                    },
+                    Action::Jump(pos) => {
+                        pos
+                    }
+                    };
+                } else {
+                    // Since we call .next() for the inner later,
+                    // we should not do any bound checks here.
+                    (0, 0).into()
+                }
             },
             inner: self,
         }
@@ -55,7 +90,7 @@ impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::pattern::{DirectionPattern, SequencePattern};
+    use crate::pattern::{DirectionPattern, StepsPattern};
 
     // 0, 1, 2, 3
     // 4, 5, 6, 7
@@ -156,7 +191,7 @@ mod test {
             (1, 0),
             (1, 0),
         ];
-        let pattern = SequencePattern::new(seq);
+        let pattern = StepsPattern::new(seq);
         let mut iter = grid.pattern((0, 1), pattern);
 
         assert_eq!(iter.next(), Some(&0));
@@ -189,7 +224,7 @@ mod test {
             (-1, 0),
             (1, 0),
         ];
-        let pattern = SequencePattern::new(seq);
+        let pattern = StepsPattern::new(seq);
         let mut iter = grid.pattern((1, 1), pattern);
 
         assert_eq!(iter.next(), Some(&1));
@@ -212,7 +247,7 @@ mod test {
         };
 
         let seq: Vec<(i32, i32)> = vec![(1, 0), (0, 1), (-1, 0), (0, -1)];
-        let pattern = SequencePattern::new(seq);
+        let pattern = StepsPattern::new(seq);
 
         let mut iter = grid.pattern((0, 1), pattern).grid_positions();
         assert_eq!(iter.next(), Some(((1, 1).into(), &3)));
