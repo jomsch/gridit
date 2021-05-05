@@ -36,12 +36,49 @@ struct BoardGame {
     draggin: Option<(graphics::Image, Name, PColor, [f32; 2])>,
 }
 
+const START_BOARD: &str = r#"
+BR BN BB BQ BK BB BN BR
+BL BG BP BP BP BP BG BL
+N N N N N N N N
+N N N N N N N N
+N N N N N N N N
+N N N N N N N N
+WL WG WP WP WP WP WG WL
+WR WN WB WQ WK WB WN WR
+"#;
+
+fn parse_to_piece(ctx: &mut Context, s: &str) -> BoardPiece{
+    let mut chars = s.chars();
+    let first = chars.next().unwrap();
+    let pcolor = match first {
+        'B' => PColor::BLACK,
+        'W' => PColor::WHITE,
+        _ => return None,
+    };
+    let second = chars.next().unwrap();
+    let name = match second {
+        'R' => Name::ROOK,
+        'N' => Name::KNIGHT,
+        'B' => Name::BISHOP,
+        'Q' => Name::QUEEN,
+        'K' => Name::KING,
+        'P' => Name::PAWN,
+        'L' => Name::BLOCKER,
+        'G' => Name::GIRAFFE,
+        _ => return None,
+    };
+
+    Some(new_piece(ctx, name, pcolor))
+}
+
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
-        let items: Vec<BoardPiece> = (0..64).map(|_| None).collect();
-        let mut grid = gridit::Grid::from(items, 8, 8);
 
-        grid.set_unchecked((4, 4), Some(new_piece(ctx, Name::PAWN, PColor::BLACK)));
+        let start_board= START_BOARD
+            .split_whitespace()
+            .map(|s| parse_to_piece(ctx, s))
+            .collect();
+        let mut grid = gridit::Grid::from(start_board, 8, 8);
 
         let hdpi_factor = graphics::window(&ctx).scale_factor() as f32;
 
