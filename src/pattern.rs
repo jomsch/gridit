@@ -126,3 +126,36 @@ impl Pattern for SideStepsPattern {
     }
 }
 
+pub struct JumpsPattern {
+    jumps: Vec<Position>,
+    idx: usize,
+}
+
+impl JumpsPattern { 
+    pub fn new<I>(positions: I) -> Self 
+    where 
+        I: IntoIterator,
+        I::Item: Copy + Into<Position>,
+    {
+        Self {
+            jumps: positions.into_iter().map(|t| t.into()).collect(),
+            idx: 0,
+        }
+    }
+}
+
+impl Pattern for JumpsPattern {
+    fn next_action(&mut self) -> Option<Action> {
+        self.idx +=1;
+        Some(Action::Jump(*self.jumps.get(self.idx -1)?))
+    }
+
+    fn next_action_peek(&self) -> Option<Action> {
+        Some(Action::Jump(*self.jumps.get(self.idx)?))
+    }
+
+    fn repeat(&self) -> &Repeat {
+        &Repeat::TillEnd
+    }
+}
+

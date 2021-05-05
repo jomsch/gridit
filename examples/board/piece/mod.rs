@@ -8,6 +8,7 @@ mod knight;
 mod pawn;
 mod queen;
 mod rook;
+mod custom_one;
 
 pub use bishop::Bishop;
 pub use king::King;
@@ -15,6 +16,7 @@ pub use knight::Knight;
 pub use pawn::Pawn;
 pub use queen::Queen;
 pub use rook::Rook;
+pub use custom_one::CustomOne;
 
 pub trait Piece {
     fn image(&self) -> &graphics::Image;
@@ -49,6 +51,7 @@ pub enum Name {
     KNIGHT,
     QUEEN,
     KING,
+    CUSTOMONE,
 }
 
 pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece> {
@@ -93,6 +96,13 @@ pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece
             let p = King::new(
                 pcolor,
                 graphics::Image::new(ctx, format!("/{}_king.png", prefix)).unwrap(),
+            );
+            Box::new(p)
+        },
+        Name::CUSTOMONE => {
+            let p = CustomOne::new(
+                pcolor,
+                graphics::Image::new(ctx, format!("/{}_t.png", prefix)).unwrap(),
             );
             Box::new(p)
         }
