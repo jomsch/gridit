@@ -5,11 +5,23 @@ pub trait Pattern {
     fn next_action_peek(&self) -> Option<Action>;
     fn repeat(&self) -> &Repeat;
 
+    // rest_step and rest_positon are kind of hacks to make 
+    // PositionEnumerator work with pattern
+
     // This is needed to get the correct position in PositionEnumerator
     // It is only needed for StepFromOrigin action and should be used so
-    fn rest_positions(&self) -> Option<Vec<Step>>{
+    fn rest_steps(&self) -> Option<Vec<Step>> {
         if matches!(self.next_action_peek(), Some(Action::StepFromOrigin(_))) {
-            panic!("StepFromOrigin must implement rest_positions");
+            panic!("Action::StepFromOrigin must implement rest_step");
+        }
+        None
+    }
+
+    // This is needed to get the correct position in PositionEnumerator
+    // It is only needed for Jump action and should be used so
+    fn rest_positions(&self) -> Option<Vec<Position>> {
+        if matches!(self.next_action_peek(), Some(Action::Jump(_))) {
+            panic!("Action::Jump must implement rest_positions");
         }
         None
     }
@@ -121,7 +133,7 @@ impl Pattern for SideStepsPattern {
         &Repeat::TillEnd
     }
 
-    fn rest_positions(&self) -> Option<Vec<Step>> {
+    fn rest_steps(&self) -> Option<Vec<Step>> {
         Some(self.steps[self.idx..].iter().map(|s| *s).collect())
     }
 }
@@ -156,6 +168,10 @@ impl Pattern for JumpsPattern {
 
     fn repeat(&self) -> &Repeat {
         &Repeat::TillEnd
+    }
+
+    fn rest_positions(&self) -> Option<Vec<Position>> {
+        Some(self.jumps[self.idx..].iter().map(|s| *s).collect())
     }
 }
 
