@@ -18,10 +18,11 @@ cargo run --example board
 ```
 
 The piece with the `T` in it is a `Blocker` it can not beat any pieces and moves by teleporting
-to a friendly piece.
+to a friendly piece.  
 The `Giraffe` is a blank piece for testing purposes. If you want to quickly test this library
-i recommend to implement some movement pattern for the [Giraffe](./examples/board/piece/giraffe.rs) in `fn possible_moves`.
-The movement patterns of all pieces can be found [here](./examples/board/pieces).
+i recommend to clone this repository and implement some movement pattern for the [Giraffe](./examples/board/piece/giraffe.rs) piece.
+Just write the `fn possible_moves` function and run the board example.
+For inspiration see implementation of the other pieces [here](./examples/board/piece).
 
 
 # Asset License
