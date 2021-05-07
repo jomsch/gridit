@@ -1,12 +1,11 @@
 mod grid;
-mod iter;
-mod pattern;
+pub mod iter;
+pub mod pattern;
 mod step;
 
 pub use grid::{Grid, Position};
-pub use iter::*;
-pub use pattern::*;
 pub use step::Step;
+pub use iter::PositionsEnumerator;
 
 #[cfg(test)]
 mod tests {

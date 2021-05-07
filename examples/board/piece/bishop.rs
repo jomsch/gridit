@@ -1,6 +1,7 @@
 use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{DirectionPattern, Grid, Position, PositionsEnumerator, Repeat};
+use gridit::{Grid, Position, PositionsEnumerator};
+use gridit::pattern::{DirectionPattern, Repeat};
 
 pub struct Bishop {
     img: graphics::Image,

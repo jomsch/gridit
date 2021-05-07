@@ -4,7 +4,6 @@ use super::step::*;
 use std::mem;
 
 
-/// Position
 /// A position in the Grid.
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 pub struct Position {
@@ -30,7 +29,6 @@ impl From<Position> for (usize, usize) {
     }
 }
 
-/// Grid
 /// 2D Grid, Position (0,0) is at the top left corner 
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {

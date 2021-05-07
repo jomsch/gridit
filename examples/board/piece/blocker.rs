@@ -1,6 +1,6 @@
 use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{DirectionPattern, Grid, Position, PositionsEnumerator, Repeat, Pattern};
+use gridit::{Grid, Position, PositionsEnumerator};
 
 pub struct Blocker {
     img: graphics::Image,
