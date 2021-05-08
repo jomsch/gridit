@@ -151,7 +151,7 @@ impl Drawable for Board {
                     let (fx, fy) = (x as f32, y as f32);
                     let cx = fx * rect_size + bx;
                     let cy = fy * rect_size + by;
-                    let radius: f32 = 15.;
+                    let radius: f32 = rect_size/10.;
                     let hs = rect_size / 2.;
                     let point: Point2<f32> = [cx + hs, cy + hs].into();
 

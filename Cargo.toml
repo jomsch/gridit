@@ -7,7 +7,6 @@ description = "2D grid library utilizing the fun of iterators"
 repository = "https://github.com/jomsch/gridit"
 readme = "README.md"
 license = "MIT"
-license-file = "LICENSE.txt"
 keywords = ["gamedev", "grid", "iterator", "datastruct", "2d"]
 categories = ["game-development"]
 
