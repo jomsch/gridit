@@ -2,30 +2,49 @@
 
 A 2D grid library utilizing the fun of iterators.
 
+`Gridit` is a 2D grid library which implements different Iterators 
+for go over the cells of the grid. 
+It was created with board games like chess in mind but can also be used for other use cases.
 
-# Examples
+
+`Gridit` started experimental, to see how it would feel to create 
+Chess movement patterns with iterators. The example chess board can be found
+in `examples/board`.
+
+## What's missing
+These functions are missing.
+Waiting for [generic associated types](https://github.com/rust-lang/rust/issues/44265)to land in rust.
+- [ ] `pattern_mut`
+- [ ] `neighbor_mut`
+
+## Feedback & Questions
+Having feedback or questions?  
+Open an issue or shot me a message on Twitter or Reddit.  
+I would love to hear your thoughts and ideas on `Gridit`.
+
+
+## Examples
 
 Run the examples as following:  
 
-## Game Of Life
+### Game Of Life
 ```
 cargo run --example gameoflife
 ```
 
-## Board
+### Board
 ```
 cargo run --example board
 ```
-
 The piece with the `T` in it is a `Blocker` it can not beat any pieces and moves by teleporting
 to a friendly piece.  
 The `Giraffe` is a blank piece for testing purposes. If you want to quickly test this library
 i recommend to clone this repository and implement some movement pattern for the [Giraffe](./examples/board/piece/giraffe.rs) piece.
 Just write the `fn possible_moves` function and run the board example.
-For inspiration see implementation of the other pieces [here](./examples/board/piece).
+For inspiration see the chess piece implementation [here](./examples/board/piece).
 
 
-# Asset License
+## Asset License
 Assets found in [resources](./resources/) are licensed under [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/legalcode).
 These assets can be found [here](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces).
 Thanks and credit to:
@@ -33,3 +52,5 @@ Thanks and credit to:
 * Francois-Pier
 * NikNaks
 
+## License
+Distributed under the MIT License. See [LICENSE.txt](./LICENSE.txt) for more information.
