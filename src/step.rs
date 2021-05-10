@@ -18,14 +18,14 @@ impl N {
 
     fn from_isize(n: isize) -> Self {
         if n < 0 {
-            return N::N((n * -1) as usize);
+            return N::N((-n) as usize);
         }
         N::P(n as usize)
     }
 
     fn from_i32(n: i32) -> Self {
         if n < 0 {
-            return N::N((n * -1) as usize);
+            return N::N((-n) as usize);
         }
         N::P(n as usize)
     }

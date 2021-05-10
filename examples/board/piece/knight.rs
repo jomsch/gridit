@@ -1,7 +1,7 @@
 use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{PositionsEnumerator, Grid, Position,};
 use gridit::pattern::SideStepsPattern;
+use gridit::{Grid, Position, PositionsEnumerator};
 
 pub struct Knight {
     img: graphics::Image,

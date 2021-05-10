@@ -8,9 +8,9 @@ pub struct Positions<I> {
 
 /// Enumerates the positions of the grid.
 /// # Example
-/// ``` 
-/// # use gridit::Grid; 
-/// use gridit::PositionsEnumerator; 
+/// ```
+/// # use gridit::Grid;
+/// use gridit::PositionsEnumerator;
 /// let grid = Grid::from(vec![1, 2, 1, 2], 2, 2);
 /// let mut iter = grid.iter()
 ///                 .grid_positions()
@@ -19,7 +19,7 @@ pub struct Positions<I> {
 /// assert_eq!(iter.next(), Some(((0, 0).into(), &1)));
 /// assert_eq!(iter.next(), Some(((0, 1).into(), &1)));
 /// assert_eq!(iter.next(), None);
-/// ``` 
+/// ```
 pub trait PositionsEnumerator
 where
     Self: Sized,

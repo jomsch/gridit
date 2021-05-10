@@ -27,11 +27,11 @@ impl<'a, T> PositionsEnumerator for NeighborIter<'a, T> {
             inner: self,
             next_pos: |inner, _| {
                 if inner.idx < inner.positions.len() {
-                    return inner.positions[inner.idx];
+                    inner.positions[inner.idx]
                 } else {
                     // This only happens when inner.next() returns None
                     // But we need to check since idx can be out of bounds.
-                    return (0, 0).into();
+                    (0, 0).into()
                 }
             },
             prev_position: None,

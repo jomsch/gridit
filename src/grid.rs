@@ -3,7 +3,6 @@ use super::pattern::*;
 use super::step::*;
 use std::mem;
 
-
 /// A position in the grid.
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 pub struct Position {
@@ -29,7 +28,7 @@ impl From<Position> for (usize, usize) {
     }
 }
 
-/// 2D Grid, Position (0,0) is at the top left corner 
+/// 2D Grid, Position (0,0) is at the top left corner
 #[derive(Debug, PartialEq)]
 pub struct Grid<T> {
     pub(crate) items: Vec<T>,
@@ -38,7 +37,7 @@ pub struct Grid<T> {
 }
 
 impl<T: Clone> Grid<T> {
-    /// Creates a new Grid with `default_value` as every value. 
+    /// Creates a new Grid with `default_value` as every value.
     /// # Example
     /// ```
     /// # use gridit::Grid;
@@ -68,7 +67,7 @@ impl<T: Default> Grid<T> {
     /// # Example
     /// ```
     /// # use gridit::Grid;
-    /// let mut grid: Grid<usize> = Grid::new(2, 2, 10); 
+    /// let mut grid: Grid<usize> = Grid::new(2, 2, 10);
     /// let old = grid.replace_default((1, 1));
     /// assert_eq!(old, Some(10));
     /// assert_eq!(grid.get((1, 1)), Some(&0));
@@ -77,7 +76,7 @@ impl<T: Default> Grid<T> {
         let pos = pos.into();
         if self.is_bounds(pos) {
             let idx = self.translate(pos);
-            let old = mem::replace(&mut self.items[idx], T::default());
+            let old = mem::take(&mut self.items[idx]);
             return Some(old);
         }
         None
@@ -174,7 +173,7 @@ impl<T> Grid<T> {
         self.items.len()
     }
 
-    /// Returns a reference to an element at position `pos` 
+    /// Returns a reference to an element at position `pos`
     /// or `None`, if `pos` is out of bounds.
     /// # Example
     /// ```
@@ -191,7 +190,7 @@ impl<T> Grid<T> {
         None
     }
 
-    /// Returns a mutable reference to an element at position `pos` 
+    /// Returns a mutable reference to an element at position `pos`
     /// or None, if `pos` is out of bounds.
     /// # Example
     /// ```
@@ -208,7 +207,7 @@ impl<T> Grid<T> {
         None
     }
 
-    /// Returns a reference to an element at position `pos` without bound checks. 
+    /// Returns a reference to an element at position `pos` without bound checks.
     /// # Example
     /// ```
     /// # use gridit::Grid;
@@ -379,7 +378,7 @@ impl<T> Grid<T> {
     /// assert_eq!(iter.next(), Some(&4));
     /// assert_eq!(iter.next(), None);
     /// ```
-    pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
+    pub fn iter(&self) -> GridIter<'_, T> {
         GridIter {
             grid_iter: self.items.iter(),
             width: self.width,
@@ -398,7 +397,7 @@ impl<T> Grid<T> {
     /// assert_eq!(iter.next(), Some(&mut 4));
     /// assert_eq!(iter.next(), None);
     /// ```
-    pub fn iter_mut<'a>(&'a mut self) -> GridIterMut<'a, T> {
+    pub fn iter_mut(&mut self) -> GridIterMut<'_, T> {
         GridIterMut {
             grid_iter: self.items.iter_mut(),
             width: self.width,
@@ -417,7 +416,7 @@ impl<T> Grid<T> {
     /// ```
     /// # Panics
     /// * if the row is out of bounds.
-    pub fn row<'a>(&'a self, y: usize) -> RowIter<'a, T> {
+    pub fn row(&self, y: usize) -> RowIter<'_, T> {
         assert!(self.is_bounds((0, y)));
         let start_idx = y * self.width;
         let end_idx = start_idx + self.width;
@@ -440,7 +439,7 @@ impl<T> Grid<T> {
     /// ```
     /// # Panics
     /// * if the row is out of bounds.
-    pub fn row_mut<'a>(&'a mut self, y: usize) -> RowIterMut<'a, T> {
+    pub fn row_mut(&mut self, y: usize) -> RowIterMut<'_, T> {
         assert!(self.is_bounds((0, y)));
         let start_idx = y * self.width;
         let end_idx = start_idx + self.width;
@@ -463,7 +462,7 @@ impl<T> Grid<T> {
     /// ```
     /// # Panics
     /// * if the column is out of bounds.
-    pub fn column<'a>(&'a self, x: usize) -> ColumnIter<'a, T> {
+    pub fn column(&self, x: usize) -> ColumnIter<'_, T> {
         assert!(self.is_bounds((x, 0)));
         ColumnIter {
             row_idx: 0,
@@ -484,7 +483,7 @@ impl<T> Grid<T> {
     /// ```
     /// # Panics
     /// * if the column is out of bounds.
-    pub fn column_mut<'a>(&'a mut self, x: usize) -> ColumnIterMut<'a, T> {
+    pub fn column_mut(&mut self, x: usize) -> ColumnIterMut<'_, T> {
         assert!(self.is_bounds((x, 0)));
         let width = self.width;
         let iter = self.iter_mut().skip(x).step_by(width);
@@ -534,7 +533,7 @@ impl<T> Grid<T> {
     /// ```
     /// # Panics
     /// * if x or y is out of bounds.
-    pub fn neighbors<'a, P: Into<Position>>(&'a self, pos: P) -> NeighborIter<'a, T> {
+    pub fn neighbors<P: Into<Position>>(&self, pos: P) -> NeighborIter<'_, T> {
         let pos = pos.into();
         assert!(self.is_bounds(pos));
         NeighborIter {
@@ -550,14 +549,14 @@ impl<T> Grid<T> {
     /// ```
     /// # use gridit::Grid;
     /// # use gridit::pattern::StepsPattern;
-    /// let mut grid = Grid::from(vec![1, 2, 3, 4], 2, 2); 
+    /// let mut grid = Grid::from(vec![1, 2, 3, 4], 2, 2);
     /// let pattern = StepsPattern::new(vec![(1,0), (-1, 0), (1, 0)]);
     /// let mut iter = grid.pattern((0, 0), pattern);
     /// assert_eq!(iter.next(), Some(&2));
     /// assert_eq!(iter.next(), Some(&1));
     /// assert_eq!(iter.next(), Some(&2));
     /// assert_eq!(iter.next(), None);
-    pub fn pattern<'a, P, Pat>(&'a self, pos: P, pattern: Pat) -> PatternIter<'a, T>
+    pub fn pattern<P, Pat>(&self, pos: P, pattern: Pat) -> PatternIter<'_, T>
     where
         P: Into<Position>,
         Pat: Pattern + 'static,

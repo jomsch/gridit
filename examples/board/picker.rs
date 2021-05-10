@@ -6,7 +6,7 @@ use ggez::{Context, GameResult};
 
 use crate::piece::*;
 
-const BACKGROUND: Color = Color::new(160./255., 121./255., 61./255., 1.0);
+const BACKGROUND: Color = Color::new(160. / 255., 121. / 255., 61. / 255., 1.0);
 
 pub struct PickerItem {
     item: Box<dyn Piece>,
@@ -93,7 +93,7 @@ impl Picker {
         let Rect { x, y, w, .. } = self.rect;
         let mut wdif = -0.;
         for (i, item) in self.items.iter_mut().enumerate() {
-            let padding = w/20.;
+            let padding = w / 20.;
             let size = w / 2. - (padding * 3.);
             let m = (i % 2) as f32;
             let ix = x + padding + (m * (size + padding * 3.));
@@ -129,7 +129,12 @@ impl Picker {
             .filter(|i| i.rect.contains(at))
             .next()
             .unwrap();
-        (item.item.image().clone(), item.name, item.pcolor, item.img_scale())
+        (
+            item.item.image().clone(),
+            item.name,
+            item.pcolor,
+            item.img_scale(),
+        )
     }
 }
 

@@ -3,22 +3,22 @@ use ggez::{graphics, Context};
 use gridit::{Grid, Position};
 
 mod bishop;
+mod blocker;
+mod giraffe;
 mod king;
 mod knight;
 mod pawn;
 mod queen;
 mod rook;
-mod blocker;
-mod giraffe;
 
 pub use bishop::Bishop;
+pub use blocker::Blocker;
+pub use giraffe::Giraffe;
 pub use king::King;
 pub use knight::Knight;
 pub use pawn::Pawn;
 pub use queen::Queen;
 pub use rook::Rook;
-pub use blocker::Blocker;
-pub use giraffe::Giraffe;
 
 pub trait Piece {
     fn image(&self) -> &graphics::Image;
@@ -101,14 +101,14 @@ pub fn new_piece(ctx: &mut Context, name: Name, pcolor: PColor) -> Box<dyn Piece
                 graphics::Image::new(ctx, format!("/{}_king.png", prefix)).unwrap(),
             );
             Box::new(p)
-        },
+        }
         Name::BLOCKER => {
             let p = Blocker::new(
                 pcolor,
                 graphics::Image::new(ctx, format!("/{}_t.png", prefix)).unwrap(),
             );
             Box::new(p)
-        },
+        }
         Name::GIRAFFE => {
             let p = Giraffe::new(
                 pcolor,

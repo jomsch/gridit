@@ -1,7 +1,7 @@
 use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{Grid, Position, PositionsEnumerator};
 use gridit::pattern::{DirectionPattern, Repeat};
+use gridit::{Grid, Position, PositionsEnumerator};
 
 pub struct Pawn {
     img: graphics::Image,
@@ -26,13 +26,15 @@ impl Piece for Pawn {
         };
 
         let pattern = DirectionPattern::new((0, m), Repeat::Once);
-        let mut front: Vec<Position> = grid.pattern(pos, pattern)
+        let mut front: Vec<Position> = grid
+            .pattern(pos, pattern)
             .grid_positions()
             .filter(|(_, o)| o.is_none())
             .map(|(pos, _)| pos)
             .collect();
 
-        let mut sidesteps: Vec<Position> = [(-1, m), (1, m)].iter()
+        let mut sidesteps: Vec<Position> = [(-1, m), (1, m)]
+            .iter()
             .map(|s| {
                 let pattern = DirectionPattern::new(*s, Repeat::Once);
                 grid.pattern(pos, pattern)
@@ -45,7 +47,6 @@ impl Piece for Pawn {
             .collect();
         sidesteps.append(&mut front);
         sidesteps
-            
     }
 
     fn pcolor(&self) -> PColor {

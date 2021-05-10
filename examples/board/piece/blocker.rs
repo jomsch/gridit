@@ -19,17 +19,16 @@ impl Piece for Blocker {
     }
 
     fn possible_moves(&self, grid: &Grid<BoardPiece>, pos: Position) -> Vec<Position> {
-        grid
-        .iter()
-        .grid_positions()
-        .filter(|(p, o)| self.same_pcolor(o) && pos != *p)
-        .map(|(p, _)| 
+        grid.iter()
+            .grid_positions()
+            .filter(|(p, o)| self.same_pcolor(o) && pos != *p)
+            .map(|(p, _)| {
                 grid.neighbors(p)
-                .grid_positions()
-                .filter(|(_, o)| o.is_none())
-                .map(|(p, _)| p)
-                .collect::<Vec<Position>>()
-                )
+                    .grid_positions()
+                    .filter(|(_, o)| o.is_none())
+                    .map(|(p, _)| p)
+                    .collect::<Vec<Position>>()
+            })
             .flatten()
             .collect()
     }

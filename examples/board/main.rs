@@ -12,7 +12,7 @@ use crate::board::*;
 use crate::picker::*;
 use crate::piece::*;
 
-const BACKGROUND: graphics::Color = graphics::Color::new(100./255., 61./255., 1./255., 1.0);
+const BACKGROUND: graphics::Color = graphics::Color::new(100. / 255., 61. / 255., 1. / 255., 1.0);
 
 fn main() {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -47,7 +47,7 @@ WL WG WP WP WP WP WG WL
 WR WN WB WQ WK WB WN WR
 "#;
 
-fn parse_to_piece(ctx: &mut Context, s: &str) -> BoardPiece{
+fn parse_to_piece(ctx: &mut Context, s: &str) -> BoardPiece {
     let mut chars = s.chars();
     let first = chars.next().unwrap();
     let pcolor = match first {
@@ -73,8 +73,7 @@ fn parse_to_piece(ctx: &mut Context, s: &str) -> BoardPiece{
 
 impl BoardGame {
     fn new(ctx: &mut Context) -> Self {
-
-        let start_board= START_BOARD
+        let start_board = START_BOARD
             .split_whitespace()
             .map(|s| parse_to_piece(ctx, s))
             .collect();
@@ -95,7 +94,7 @@ impl BoardGame {
         let hdpi_factor = graphics::window(ctx).scale_factor() as f32;
         let (x, y) = graphics::size(ctx);
         let size = if x >= y { y } else { x * 0.8 };
-        let padding = x/16.;
+        let padding = x / 16.;
         let draw_rect = Rect::new(
             padding,
             padding,
@@ -110,7 +109,7 @@ impl BoardGame {
         let (x, y) = graphics::size(ctx);
         let height = y;
         let width = x * 0.20;
-        let padding = x/16.;
+        let padding = x / 16.;
 
         let draw_rect = Rect::new(
             (x - width) * hdpi_factor,

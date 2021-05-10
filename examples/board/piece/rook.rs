@@ -1,7 +1,7 @@
 use super::{BoardPiece, PColor, Piece};
 use ggez::graphics;
-use gridit::{Grid, Position, PositionsEnumerator};
 use gridit::pattern::{DirectionPattern, Repeat};
+use gridit::{Grid, Position, PositionsEnumerator};
 
 pub struct Rook {
     img: graphics::Image,

@@ -8,9 +8,9 @@ use gridit::{Grid, Position, PositionsEnumerator};
 
 use crate::piece::Piece;
 
-pub const WHITE: Color = Color::new(210./255., 171./255.,111./255., 1.0);
-pub const BLACK: Color = Color::new(155./255., 111./255.,51./255., 1.0);
-pub const SELECT: Color = Color::new(34. / 255., 201. / 255., 220./ 255., 1.0);
+pub const WHITE: Color = Color::new(210. / 255., 171. / 255., 111. / 255., 1.0);
+pub const BLACK: Color = Color::new(155. / 255., 111. / 255., 51. / 255., 1.0);
+pub const SELECT: Color = Color::new(34. / 255., 201. / 255., 220. / 255., 1.0);
 pub const HOVER: Color = Color::new(0.5, 0.5, 0.5, 0.7);
 
 pub type BoardPiece = Option<Box<dyn Piece>>;
@@ -131,8 +131,8 @@ impl Drawable for Board {
                 let mut drect = rect;
                 drect.scale(0.75, 0.75);
                 let img_rect = img.dimensions();
-                let sx = drect.w/img_rect.w;
-                let sy = drect.h/img_rect.h;
+                let sx = drect.w / img_rect.w;
+                let sy = drect.h / img_rect.h;
                 let iw = drect.w / 2.;
                 let ih = drect.h / 2.;
                 let rw = rect.w / 2.0;
@@ -151,7 +151,7 @@ impl Drawable for Board {
                     let (fx, fy) = (x as f32, y as f32);
                     let cx = fx * rect_size + bx;
                     let cy = fy * rect_size + by;
-                    let radius: f32 = rect_size/10.;
+                    let radius: f32 = rect_size / 10.;
                     let hs = rect_size / 2.;
                     let point: Point2<f32> = [cx + hs, cy + hs].into();
 

@@ -1,5 +1,5 @@
 use super::{Positions, PositionsEnumerator};
-use crate::pattern::{Pattern, Repeat, Action};
+use crate::pattern::{Action, Pattern, Repeat};
 use crate::{Grid, Position};
 
 pub struct PatternIter<'a, T> {
@@ -33,11 +33,15 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
                 self.repeat_count += 1;
                 self.prev_position = next_position;
                 Some(cell)
-            },
+            }
             Action::StepFromOrigin(step) => {
                 let mut next_position = step.take_step_from_position(self.origin_position);
-                while next_position.is_none() || 
-                    self.grid.get(next_position.unwrap_or((0, 0).into())).is_none() {
+                while next_position.is_none()
+                    || self
+                        .grid
+                        .get(next_position.unwrap_or((0, 0).into()))
+                        .is_none()
+                {
                     let action = self.pattern.next_action()?;
                     let step = match action {
                         Action::StepFromOrigin(step) => step,
@@ -51,21 +55,21 @@ impl<'a, T> Iterator for PatternIter<'a, T> {
                 self.repeat_count += 1;
                 self.prev_position = next_position;
                 Some(cell)
-            },
+            }
             Action::Jump(pos) => {
                 let mut pos = pos;
                 while !self.grid.is_bounds(pos) {
                     let action = self.pattern.next_action()?;
                     pos = match action {
                         Action::Jump(p) => p,
-                        _ => panic!("different actions per pattern not supported"), 
+                        _ => panic!("different actions per pattern not supported"),
                     };
                 }
                 let cell = self.grid.get_unchecked(pos);
                 self.repeat_count += 1;
                 self.prev_position = pos;
                 Some(cell)
-            },
+            }
         }
     }
 }
@@ -75,44 +79,49 @@ impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
         Positions {
             prev_position: Some(self.prev_position),
             next_pos: |inner, prev| {
-                if let Some(action) =  inner.pattern.next_action_peek() {
+                if let Some(action) = inner.pattern.next_action_peek() {
                     return match action {
-                    Action::Step(step) => {
+                        Action::Step(step) => {
                             //prev can not be None in this case, since we set prev_position
-                            step
-                                .take_step_from_position(prev.unwrap())
+                            step.take_step_from_position(prev.unwrap())
                                 .unwrap_or_default()
-
-                    },
-                    Action::StepFromOrigin(step) => {
+                        }
+                        Action::StepFromOrigin(step) => {
                             let origin_position = inner.origin_position;
                             let mut step = step;
                             let mut next_position = step.take_step_from_position(origin_position);
-                            let steps = inner.pattern.rest_steps().expect("Implement fn rest_positionn");
+                            let steps = inner
+                                .pattern
+                                .rest_steps()
+                                .expect("Implement fn rest_positionn");
                             let mut steps = steps.iter();
-                            // We can unwrap_or in this while loop since if we are at the end of the 
+                            // We can unwrap_or in this while loop since if we are at the end of the
                             // iterator, next is called till it will return None in PositionEnuemrator
                             // Unwarp should always be (0, 0) since then we can leave the loop at the end
-                            while next_position.is_none() || 
-                                !inner.grid.is_bounds(next_position.unwrap_or((0, 0).into())) {
+                            while next_position.is_none()
+                                || !inner.grid.is_bounds(next_position.unwrap_or((0, 0).into()))
+                            {
                                 step = *steps.next().unwrap_or(&(0, 0).into());
                                 next_position = step.take_step_from_position(origin_position);
                             }
                             // This can only be Some since we checka
                             next_position.unwrap()
-                    },
-                    Action::Jump(pos) => {
-                        let mut pos = pos;
-                        let rest_positions = inner.pattern.rest_positions().expect("Please implement rest_position for pattern");
-                        let mut positions = rest_positions.iter();
-                        // Ignore positions no in grid
-                        // We can unwrap_or here since the inner iterator next will return None anyway
-                        // if positions is exhausted.
-                        while !inner.grid.is_bounds(pos) {
-                            pos = *positions.next().unwrap_or(&(0, 0).into());
                         }
-                        pos
-                    }
+                        Action::Jump(pos) => {
+                            let mut pos = pos;
+                            let rest_positions = inner
+                                .pattern
+                                .rest_positions()
+                                .expect("Please implement rest_position for pattern");
+                            let mut positions = rest_positions.iter();
+                            // Ignore positions no in grid
+                            // We can unwrap_or here since the inner iterator next will return None anyway
+                            // if positions is exhausted.
+                            while !inner.grid.is_bounds(pos) {
+                                pos = *positions.next().unwrap_or(&(0, 0).into());
+                            }
+                            pos
+                        }
                     };
                 } else {
                     // Since we call .next() for the inner later,
@@ -128,7 +137,7 @@ impl<'a, T> PositionsEnumerator for PatternIter<'a, T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::pattern::{DirectionPattern, StepsPattern, SideStepsPattern, JumpsPattern};
+    use crate::pattern::{DirectionPattern, JumpsPattern, SideStepsPattern, StepsPattern};
 
     // 0, 1, 2, 3
     // 4, 5, 6, 7
@@ -304,7 +313,7 @@ mod test {
         };
 
         // Every Step greater than 1 should be ignored
-        let sidesteps = vec![(-4, -4), (0, -1), (5, 5), (1, 0), (3, 3),(0, 1), (-1, 0), ];
+        let sidesteps = vec![(-4, -4), (0, -1), (5, 5), (1, 0), (3, 3), (0, 1), (-1, 0)];
         let pattern = SideStepsPattern::new(sidesteps);
         let mut iter = grid.pattern((1, 1), pattern);
         assert_eq!(iter.next(), Some(&1));
@@ -323,7 +332,7 @@ mod test {
         };
 
         // Every Step greater than 1 should be ignored
-        let sidesteps = vec![(0, -1), (5, 5), (1, 0), (3, 3),(0, 1), (-1, 0), ];
+        let sidesteps = vec![(0, -1), (5, 5), (1, 0), (3, 3), (0, 1), (-1, 0)];
         let pattern = SideStepsPattern::new(sidesteps);
         let mut iter = grid.pattern((1, 1), pattern).grid_positions();
         assert_eq!(iter.next(), Some(((1, 0).into(), &1)));
@@ -336,12 +345,12 @@ mod test {
     #[test]
     fn pattern_iter_jumps() {
         let grid = Grid {
-            width:3,
+            width: 3,
             height: 3,
             items: (0..9).collect(),
         };
 
-        let jumps = vec![(4, 2),(2, 2), (1, 1), (0, 0),(5, 5), (32, 32), (1, 0)];
+        let jumps = vec![(4, 2), (2, 2), (1, 1), (0, 0), (5, 5), (32, 32), (1, 0)];
         let pattern = JumpsPattern::new(jumps);
         let mut iter = grid.pattern((0, 0), pattern);
         assert_eq!(iter.next(), Some(&8));
@@ -354,12 +363,12 @@ mod test {
     #[test]
     fn pattern_iter_jumps_positions() {
         let grid = Grid {
-            width:3,
+            width: 3,
             height: 3,
             items: (0..9).collect(),
         };
 
-        let jumps = vec![(4, 2),(2, 2), (1, 1), (0, 0),(5, 5), (32, 32), (1, 0)];
+        let jumps = vec![(4, 2), (2, 2), (1, 1), (0, 0), (5, 5), (32, 32), (1, 0)];
         let pattern = JumpsPattern::new(jumps);
         let mut iter = grid.pattern((0, 0), pattern).grid_positions();
         assert_eq!(iter.next(), Some(((2, 2).into(), &8)));

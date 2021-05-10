@@ -1,8 +1,8 @@
 //! All patterns and Pattern Trait used for [pattern](crate::Grid::pattern).
-use crate::{Step, Position};
+use crate::{Position, Step};
 
 /// This trait is there to create pattern for the [PatternIter](crate::iter::PatternIter).
-/// The implemntation should only return one variant of Action. 
+/// The implemntation should only return one variant of Action.
 /// # Variants
 /// * `Action::StepFromOrigin(step_x)` if `step_x` steps outside the grid, this Action will be ignored and next_action will be called again.
 /// * `Action::Jump(position_x)` if `position_x` is outside the grid, this Action will be ignored and next_action will be called again.
@@ -22,9 +22,8 @@ pub trait Pattern {
     /// Returns a reference to the `Repeat`.
     fn repeat(&self) -> &Repeat;
 
-    // rest_step and rest_positon are kind of hacks to make 
+    // rest_step and rest_positon are kind of hacks to make
     // PositionEnumerator work with pattern
-
 
     /// Returns the rest of the steps. This must be implemented for `Action::StepFromOrigin`.
     // This is needed to get the correct position in PositionEnumerator
@@ -65,7 +64,6 @@ pub enum Action {
     Jump(Position),
 }
 
-
 /// How often a pattern is run.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Repeat {
@@ -73,7 +71,6 @@ pub enum Repeat {
     TillEnd,
     Times(usize),
 }
-
 
 /// Steps in only one direction until end or grid or the repeat condition is meet.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -90,7 +87,6 @@ impl DirectionPattern {
         }
     }
 }
-
 
 impl Pattern for DirectionPattern {
     fn next_action(&mut self) -> Option<Action> {
@@ -144,8 +140,8 @@ pub struct SideStepsPattern {
 }
 
 impl SideStepsPattern {
-    pub fn new<I>(steps: I) -> Self 
-    where 
+    pub fn new<I>(steps: I) -> Self
+    where
         I: IntoIterator,
         I::Item: Copy + Into<Step>,
     {
@@ -171,7 +167,7 @@ impl Pattern for SideStepsPattern {
     }
 
     fn rest_steps(&self) -> Option<Vec<Step>> {
-        Some(self.steps[self.idx..].iter().map(|s| *s).collect())
+        Some(self.steps[self.idx..].iter().copied().collect())
     }
 }
 
@@ -182,9 +178,9 @@ pub struct JumpsPattern {
     idx: usize,
 }
 
-impl JumpsPattern { 
-    pub fn new<I>(positions: I) -> Self 
-    where 
+impl JumpsPattern {
+    pub fn new<I>(positions: I) -> Self
+    where
         I: IntoIterator,
         I::Item: Copy + Into<Position>,
     {
@@ -197,8 +193,8 @@ impl JumpsPattern {
 
 impl Pattern for JumpsPattern {
     fn next_action(&mut self) -> Option<Action> {
-        self.idx +=1;
-        Some(Action::Jump(*self.jumps.get(self.idx -1)?))
+        self.idx += 1;
+        Some(Action::Jump(*self.jumps.get(self.idx - 1)?))
     }
 
     fn next_action_peek(&self) -> Option<Action> {
@@ -210,7 +206,6 @@ impl Pattern for JumpsPattern {
     }
 
     fn rest_positions(&self) -> Option<Vec<Position>> {
-        Some(self.jumps[self.idx..].iter().map(|s| *s).collect())
+        Some(self.jumps[self.idx..].iter().copied().collect())
     }
 }
-
