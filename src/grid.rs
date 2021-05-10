@@ -4,7 +4,7 @@ use super::step::*;
 use std::mem;
 
 
-/// A position in the Grid.
+/// A position in the grid.
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 pub struct Position {
     pub x: usize,
@@ -548,7 +548,8 @@ impl<T> Grid<T> {
     /// See [Pattern] more details.
     /// # Example
     /// ```
-    /// # use gridit::{Grid, StepsPattern};
+    /// # use gridit::Grid;
+    /// # use gridit::pattern::StepsPattern;
     /// let mut grid = Grid::from(vec![1, 2, 3, 4], 2, 2); 
     /// let pattern = StepsPattern::new(vec![(1,0), (-1, 0), (1, 0)]);
     /// let mut iter = grid.pattern((0, 0), pattern);

@@ -1,6 +1,6 @@
 use super::Position;
 // Utility Enum for storing Negative(N) and Positive(P) as usize
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub(crate) enum N {
     //Negative Number
     N(usize),
@@ -38,13 +38,21 @@ impl N {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+/// A Step or direction to the next position in the grid, always relative to a position.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Step {
     x: N,
     y: N,
 }
 
 impl Step {
+    /// Create a new step.
+    /// # Example
+    /// ```
+    /// # use gridit::Step;
+    /// let step = Step::new(1, 2);
+    /// assert_eq!(step, Step::from((1, 2)));
+    /// ```
     pub fn new(x: usize, y: usize) -> Self {
         Step {
             x: N::P(x),
@@ -52,11 +60,27 @@ impl Step {
         }
     }
 
+    /// Negate the x value of the step.
+    /// This is usefull when the x value needs to be negative and larger then `i32`.
+    /// ```
+    /// # use gridit::Step;
+    /// let step = Step::new(2, 2)
+    ///                 .negate_x();
+    /// assert_eq!(step, Step::from((-2, 2)));
+    /// ```
     pub fn negate_x(mut self) -> Self {
         self.x = N::N(self.x.get_number());
         self
     }
 
+    /// Negate the y value of the step.
+    /// This is usefull when the y value needs to be negative and larger then `i32`.
+    /// ```
+    /// # use gridit::Step;
+    /// let step = Step::new(2, 2)
+    ///                 .negate_y();
+    /// assert_eq!(step, (2, -2).into());
+    /// ```
     pub fn negate_y(mut self) -> Self {
         self.y = N::N(self.y.get_number());
         self
