@@ -12,7 +12,7 @@ Chess movement patterns with iterators. The example chess board can be found
 in `examples/board`.
 
 
-Simple possible moves of the king without checking for check.
+Simple example: possible moves of the king without checking for check.
 ```rust
 fn possible_moves(&self, grid: &Grid<BoardPiece>, current_pos: Position) -> Vec<Position> {
 	grid.neighbors(pos)
