@@ -45,7 +45,7 @@ to a friendly piece.
 The `Giraffe` is a blank piece for testing purposes. If you want to quickly test this library
 i recommend to clone this repository and implement some movement pattern for the [Giraffe](./examples/board/piece/giraffe.rs) piece.
 Just write the `fn possible_moves` function and run the board example.
-For inspiration see the chess piece implementation [here](./examples/board/piece).
+For inspiration see the chess piece implementations [here](./examples/board/piece).
 
 ## What's missing
 These functions are missing.
