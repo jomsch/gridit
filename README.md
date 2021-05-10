@@ -54,9 +54,9 @@ Waiting for [generic associated types](https://github.com/rust-lang/rust/issues/
 - [ ] `neighbor_mut`
 
 ## Feedback & Questions
-Having feedback or questions?  
-Open an issue or shot me a message on Twitter.  
-I would love to hear your thoughts and ideas on `Gridit`.
+If you have any feedback or question,  
+open an issue or shot me a message on Twitter.  
+I would love to hear some thoughts and ideas on `Gridit`.
 
 
 
