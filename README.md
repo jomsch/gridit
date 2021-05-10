@@ -55,7 +55,7 @@ Waiting for [generic associated types](https://github.com/rust-lang/rust/issues/
 
 ## Feedback & Questions
 Having feedback or questions?  
-Open an issue or shot me a message on Twitter or Reddit.  
+Open an issue or shot me a message on Twitter.  
 I would love to hear your thoughts and ideas on `Gridit`.
 
 
