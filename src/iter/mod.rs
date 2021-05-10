@@ -1,3 +1,5 @@
+//! All iterators used in [Grid](crate::Grid).
+
 mod column_iter;
 mod grid_iter;
 mod neighbor_iter;

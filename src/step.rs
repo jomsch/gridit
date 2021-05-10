@@ -61,7 +61,7 @@ impl Step {
     }
 
     /// Negate the x value of the step.
-    /// This is usefull when the x value needs to be negative and larger then `i32`.
+    /// This is usefull when a step is needed with a `x` value larger then `i32`.
     /// ```
     /// # use gridit::Step;
     /// let step = Step::new(2, 2)
@@ -74,7 +74,7 @@ impl Step {
     }
 
     /// Negate the y value of the step.
-    /// This is usefull when the y value needs to be negative and larger then `i32`.
+    /// This is usefull when a step is needed with a `y` value larger then `i32`.
     /// ```
     /// # use gridit::Step;
     /// let step = Step::new(2, 2)
